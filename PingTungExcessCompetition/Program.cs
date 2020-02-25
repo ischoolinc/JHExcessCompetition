@@ -23,7 +23,7 @@ namespace PingTungExcessCompetition
                 {
 
                     ServiceReportForm srf = new ServiceReportForm();
-                    // pf.SetClassIDList(K12.Presentation.NLDPanels.Class.SelectedSource);
+                    srf.SetClassIDs(K12.Presentation.NLDPanels.Class.SelectedSource);
                     srf.ShowDialog();
                 }
                 else
