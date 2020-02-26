@@ -252,6 +252,10 @@ namespace PingTungExcessCompetition.DAO
                 }
             }
 
+            // 因規定上限10分
+            if (ServiceScore > 10)
+                ServiceScore = 10;
+
             //// 3 分 班級幹部
             //if (HasScore1)
             //    ServiceScore += 3;
