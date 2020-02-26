@@ -134,6 +134,7 @@ namespace PingTungExcessCompetition
             // 產生合併欄位
             dtTable.Columns.Add("學校名稱");
             dtTable.Columns.Add("班級名稱");
+            dtTable.Columns.Add("學年度");
 
             for (int studIdx = 1; studIdx <= 50; studIdx++)
             {
@@ -176,12 +177,17 @@ namespace PingTungExcessCompetition
                     row["班級名稱"] = classRecDict[class_id].Name;
                 }
 
+                int sc;
+                if (int.TryParse(K12.Data.School.DefaultSchoolYear, out sc))
+                {
+                    row["學年度"] = sc + 1;
+                }
                 if (ClassStudentDict.ContainsKey(class_id))
                 {
                     int studIdx = 1;
                     foreach (StudentInfo si in ClassStudentDict[class_id])
                     {
-                       
+
                         row["座號" + studIdx] = si.SeatNo;
                         row["姓名" + studIdx] = si.StudentName;
                         row["服務表現項目7上" + studIdx] = string.Join("\n", si.ServiceItem_7a.ToArray());

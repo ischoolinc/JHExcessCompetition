@@ -65,7 +65,7 @@ namespace PingTungExcessCompetition.DAO
         /// <summary>
         /// 計算成績
         /// </summary>
-        public void CalcScore()
+        public void CalcScore(List<string> CadreNameFilter)
         {
             HasScore1 = HasScore2 = HasScore3 = false;
             // 109 學年度屏東
@@ -76,6 +76,8 @@ namespace PingTungExcessCompetition.DAO
             //  社團幹部
             //  學校幹部
             //  班級幹部
+
+
 
             // 取得幹部紀錄比對並放入相關資料
             foreach (SemsHistoryInfo shi in SemsHistoryInfoList)
@@ -95,7 +97,7 @@ namespace PingTungExcessCompetition.DAO
                                     ServiceScore += 2;
                                     ServiceItem_7a.Add(ci.CadreName);
                                 }
-                                else if (ci.ReferenceType == "班級幹部")
+                                else if (ci.ReferenceType == "班級幹部" && CadreNameFilter.Contains(ci.CadreName))
                                 {
                                     //  HasScore1 = true;
                                     ServiceScore += 3;
@@ -127,7 +129,7 @@ namespace PingTungExcessCompetition.DAO
                                     ServiceScore += 2;
                                     ServiceItem_7b.Add(ci.CadreName);
                                 }
-                                else if (ci.ReferenceType == "班級幹部")
+                                else if (ci.ReferenceType == "班級幹部" && CadreNameFilter.Contains(ci.CadreName))
                                 {
                                     //  HasScore1 = true;
                                     ServiceScore += 3;
@@ -162,7 +164,7 @@ namespace PingTungExcessCompetition.DAO
                                     ServiceScore += 2;
                                     ServiceItem_8a.Add(ci.CadreName);
                                 }
-                                else if (ci.ReferenceType == "班級幹部")
+                                else if (ci.ReferenceType == "班級幹部" && CadreNameFilter.Contains(ci.CadreName))
                                 {
                                     // HasScore1 = true;
                                     ServiceScore += 3;
@@ -194,7 +196,7 @@ namespace PingTungExcessCompetition.DAO
                                     ServiceScore += 2;
                                     ServiceItem_8b.Add(ci.CadreName);
                                 }
-                                else if (ci.ReferenceType == "班級幹部")
+                                else if (ci.ReferenceType == "班級幹部" && CadreNameFilter.Contains(ci.CadreName))
                                 {
                                     //HasScore1 = true;
                                     ServiceScore += 3;
@@ -230,7 +232,7 @@ namespace PingTungExcessCompetition.DAO
                                     ServiceScore += 2;
                                     ServiceItem_9a.Add(ci.CadreName);
                                 }
-                                else if (ci.ReferenceType == "班級幹部")
+                                else if (ci.ReferenceType == "班級幹部" && CadreNameFilter.Contains(ci.CadreName))
                                 {
                                     // HasScore1 = true;
                                     ServiceScore += 3;

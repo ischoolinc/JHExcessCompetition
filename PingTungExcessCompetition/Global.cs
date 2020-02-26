@@ -44,7 +44,7 @@ namespace PingTungExcessCompetition
             Aspose.Words.DocumentBuilder builder = new Aspose.Words.DocumentBuilder(tempDoc);
             builder.MoveToDocumentEnd();
             builder.Writeln();
-         
+
 
             builder.StartTable();
             builder.InsertCell(); builder.Write("學校名稱");
@@ -55,7 +55,10 @@ namespace PingTungExcessCompetition
             builder.InsertCell();
             builder.InsertField("MERGEFIELD " + "班級名稱" + " \\* MERGEFORMAT ", "«" + "班級名稱" + "»");
             builder.EndRow();
-
+            builder.InsertCell(); builder.Write("學年度");
+            builder.InsertCell();
+            builder.InsertField("MERGEFIELD " + "學年度" + " \\* MERGEFORMAT ", "«" + "學年度" + "»");
+            builder.EndRow();
             builder.EndTable();
 
             builder.Writeln();
