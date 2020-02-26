@@ -158,13 +158,13 @@ namespace PingTungExcessCompetition
                     classRecDict.Add(data.ID, data);
             }
 
-            StreamWriter sw1 = new StreamWriter(Application.StartupPath + "\\合併欄位.txt");
-            StringBuilder sb1 = new StringBuilder();
-            foreach (DataColumn dc in dtTable.Columns)
-                sb1.AppendLine(dc.Caption);
+            //StreamWriter sw1 = new StreamWriter(Application.StartupPath + "\\合併欄位.txt");
+            //StringBuilder sb1 = new StringBuilder();
+            //foreach (DataColumn dc in dtTable.Columns)
+            //    sb1.AppendLine(dc.Caption);
 
-            sw1.Write(sb1.ToString());
-            sw1.Close();
+            //sw1.Write(sb1.ToString());
+            //sw1.Close();
 
             // 排序後班級
             foreach (string class_id in ClassTeacherNameDict.Keys)
@@ -198,9 +198,9 @@ namespace PingTungExcessCompetition
                 dtTable.Rows.Add(row);
             }
 
-            // debug
-            dtTable.TableName = "debug";
-            dtTable.WriteXml(Application.StartupPath + "\\debug.xml");
+            //// debug
+            //dtTable.TableName = "debug";
+            //dtTable.WriteXml(Application.StartupPath + "\\debug.xml");
 
             Document doc = _Configure.Template;
             doc.MailMerge.Execute(dtTable);

@@ -88,19 +88,23 @@ namespace PingTungExcessCompetition.DAO
                         {
                             if (ci.SchoolYear == shi.SchoolYear && ci.Semester == shi.Semester)
                             {
+                                //
                                 if (ci.ReferenceType == "班級幹部" && ci.CadreName == "特殊服務表現")
                                 {
-                                    HasScore3 = true;
+                                    // HasScore3 = true;
+                                    ServiceScore += 2;
                                     ServiceItem_7a.Add(ci.CadreName);
                                 }
                                 else if (ci.ReferenceType == "班級幹部")
                                 {
-                                    HasScore1 = true;
+                                    //  HasScore1 = true;
+                                    ServiceScore += 3;
                                     ServiceItem_7a.Add(ci.CadreName);
                                 }
                                 else if (ci.ReferenceType == "社團幹部" && ci.CadreName == "社長")
                                 {
-                                    HasScore2 = true;
+                                    //  HasScore2 = true;
+                                    ServiceScore += 2;
                                     ServiceItem_7a.Add(ci.CadreName);
                                 }
                                 else
@@ -119,17 +123,20 @@ namespace PingTungExcessCompetition.DAO
                             {
                                 if (ci.ReferenceType == "班級幹部" && ci.CadreName == "特殊服務表現")
                                 {
-                                    HasScore3 = true;
+                                    // HasScore3 = true;
+                                    ServiceScore += 2;
                                     ServiceItem_7b.Add(ci.CadreName);
                                 }
                                 else if (ci.ReferenceType == "班級幹部")
                                 {
-                                    HasScore1 = true;
+                                    //  HasScore1 = true;
+                                    ServiceScore += 3;
                                     ServiceItem_7b.Add(ci.CadreName);
                                 }
                                 else if (ci.ReferenceType == "社團幹部" && ci.CadreName == "社長")
                                 {
-                                    HasScore2 = true;
+                                    // HasScore2 = true;
+                                    ServiceScore += 2;
                                     ServiceItem_7b.Add(ci.CadreName);
                                 }
                                 else
@@ -151,17 +158,20 @@ namespace PingTungExcessCompetition.DAO
                             {
                                 if (ci.ReferenceType == "班級幹部" && ci.CadreName == "特殊服務表現")
                                 {
-                                    HasScore3 = true;
+                                    // HasScore3 = true;
+                                    ServiceScore += 2;
                                     ServiceItem_8a.Add(ci.CadreName);
                                 }
                                 else if (ci.ReferenceType == "班級幹部")
                                 {
-                                    HasScore1 = true;
+                                    // HasScore1 = true;
+                                    ServiceScore += 3;
                                     ServiceItem_8a.Add(ci.CadreName);
                                 }
                                 else if (ci.ReferenceType == "社團幹部" && ci.CadreName == "社長")
                                 {
-                                    HasScore2 = true;
+                                    // HasScore2 = true;
+                                    ServiceScore += 2;
                                     ServiceItem_8a.Add(ci.CadreName);
                                 }
                                 else
@@ -172,7 +182,7 @@ namespace PingTungExcessCompetition.DAO
                         }
                     }
 
-                    if(shi.Semester == "2")
+                    if (shi.Semester == "2")
                     {
                         foreach (CadreInfo ci in CadreInfoList)
                         {
@@ -180,17 +190,20 @@ namespace PingTungExcessCompetition.DAO
                             {
                                 if (ci.ReferenceType == "班級幹部" && ci.CadreName == "特殊服務表現")
                                 {
-                                    HasScore3 = true;
+                                    // HasScore3 = true;
+                                    ServiceScore += 2;
                                     ServiceItem_8b.Add(ci.CadreName);
                                 }
                                 else if (ci.ReferenceType == "班級幹部")
                                 {
-                                    HasScore1 = true;
+                                    //HasScore1 = true;
+                                    ServiceScore += 3;
                                     ServiceItem_8b.Add(ci.CadreName);
                                 }
                                 else if (ci.ReferenceType == "社團幹部" && ci.CadreName == "社長")
                                 {
-                                    HasScore2 = true;
+                                    //  HasScore2 = true;
+                                    ServiceScore += 2;
                                     ServiceItem_8b.Add(ci.CadreName);
                                 }
                                 else
@@ -200,7 +213,7 @@ namespace PingTungExcessCompetition.DAO
                             }
                         }
                     }
-                   
+
                 }
 
                 if (shi.GradeYear == "3" || shi.GradeYear == "9")
@@ -213,17 +226,20 @@ namespace PingTungExcessCompetition.DAO
                             {
                                 if (ci.ReferenceType == "班級幹部" && ci.CadreName == "特殊服務表現")
                                 {
-                                    HasScore3 = true;
+                                    //HasScore3 = true;
+                                    ServiceScore += 2;
                                     ServiceItem_9a.Add(ci.CadreName);
                                 }
                                 else if (ci.ReferenceType == "班級幹部")
                                 {
-                                    HasScore1 = true;
+                                    // HasScore1 = true;
+                                    ServiceScore += 3;
                                     ServiceItem_9a.Add(ci.CadreName);
                                 }
                                 else if (ci.ReferenceType == "社團幹部" && ci.CadreName == "社長")
                                 {
-                                    HasScore2 = true;
+                                    // HasScore2 = true;
+                                    ServiceScore += 2;
                                     ServiceItem_9a.Add(ci.CadreName);
                                 }
                                 else
@@ -236,17 +252,17 @@ namespace PingTungExcessCompetition.DAO
                 }
             }
 
-            // 3 分 班級幹部
-            if (HasScore1)
-                ServiceScore += 3;
+            //// 3 分 班級幹部
+            //if (HasScore1)
+            //    ServiceScore += 3;
 
-            // 2 分 社團幹部 社長
-            if (HasScore2)
-                ServiceScore += 2;
+            //// 2 分 社團幹部 社長
+            //if (HasScore2)
+            //    ServiceScore += 2;
 
-            // 2 分 班級幹部 特殊服務表現
-            if (HasScore3)
-                ServiceScore += 2;
+            //// 2 分 班級幹部 特殊服務表現
+            //if (HasScore3)
+            //    ServiceScore += 2;
         }
     }
 }
