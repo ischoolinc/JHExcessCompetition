@@ -113,6 +113,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configure.cs" />
+    <Compile Include="DAO\CadreInfo.cs" />
     <Compile Include="DAO\ClassInfo.cs" />
     <Compile Include="DAO\QueryData.cs" />
     <Compile Include="DAO\SemsHistoryInfo.cs" />

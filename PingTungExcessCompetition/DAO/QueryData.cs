@@ -130,10 +130,44 @@ WHERE update_code<>'1' AND student.status=1 AND student.ref_class_id IN(" + clas
                 }
 
 
-   // 取得幹部資料
+                // 取得幹部資料
+                Dictionary<string, List<CadreInfo>> studCadDict = new Dictionary<string, List<CadreInfo>>();
+                string qryCadre = @"
+SELECT 
+        student.id AS student_id
+        ,schoolyear AS school_year
+        ,semester
+        ,referencetype
+        ,cadrename
+ FROM 
+    student INNER JOIN $behavior.thecadre
+         ON student.id = CAST($behavior.thecadre.studentid AS INTEGER) 
+  WHERE student.status=1 AND student.ref_class_id IN(" + classIDs + @") 
+     ORDER BY student.id,$behavior.thecadre.schoolyear,semester
+";
+
+                DataTable dtCadre = qh.Select(qryCadre);
+                if (dtCadre != null)
+                {
+                    foreach (DataRow dr in dtCadre.Rows)
+                    {
+                        string sid = dr["student_id"].ToString();
+
+                        if (!studCadDict.ContainsKey(sid))
+                            studCadDict.Add(sid, new List<CadreInfo>());
+
+                        CadreInfo ci = new CadreInfo();
+                        ci.StudentID = sid;
+                        ci.SchoolYear = dr["school_year"].ToString();
+                        ci.Semester = dr["semester"].ToString();
+                        ci.ReferenceType = dr["referencetype"].ToString();
+                        ci.CadreName = dr["cadrename"].ToString();
+                        studCadDict[sid].Add(ci);
+                    }
+                }
 
 
-
+                // 學生資料取得與整理需要相關資料
                 if (dtStud != null)
                 {
                     foreach (DataRow dr in dtStud.Rows)
@@ -179,9 +213,16 @@ WHERE update_code<>'1' AND student.status=1 AND student.ref_class_id IN(" + clas
                             si.ServiceMemo = studUpdaeRecDict[si.StudentID];
                         }
 
+                        // 放入幹部資料
+                        if (studCadDict.ContainsKey(si.StudentID))
+                        {
+                            si.CadreInfoList = studCadDict[si.StudentID];
+                        }
 
-                        // 計算積分
+                        // 計算幹部積分
                         si.CalcScore();
+
+
                         if (!value.ContainsKey(si.ClassID))
                             value.Add(si.ClassID, new List<StudentInfo>());
 
