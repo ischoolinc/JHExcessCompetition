@@ -33,6 +33,7 @@
             this.lnkChangeTemplate = new System.Windows.Forms.LinkLabel();
             this.btnPrint = new DevComponents.DotNetBar.ButtonX();
             this.btnCancel = new DevComponents.DotNetBar.ButtonX();
+            this.lnkDefault = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
             // lnkViewMapColumns
@@ -44,7 +45,7 @@
             this.lnkViewMapColumns.Location = new System.Drawing.Point(202, 43);
             this.lnkViewMapColumns.Name = "lnkViewMapColumns";
             this.lnkViewMapColumns.Size = new System.Drawing.Size(112, 17);
-            this.lnkViewMapColumns.TabIndex = 15;
+            this.lnkViewMapColumns.TabIndex = 2;
             this.lnkViewMapColumns.TabStop = true;
             this.lnkViewMapColumns.Text = "檢視合併欄位總表";
             this.lnkViewMapColumns.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkViewMapColumns_LinkClicked);
@@ -58,7 +59,7 @@
             this.lnkViewTemplate.Location = new System.Drawing.Point(23, 43);
             this.lnkViewTemplate.Name = "lnkViewTemplate";
             this.lnkViewTemplate.Size = new System.Drawing.Size(86, 17);
-            this.lnkViewTemplate.TabIndex = 13;
+            this.lnkViewTemplate.TabIndex = 0;
             this.lnkViewTemplate.TabStop = true;
             this.lnkViewTemplate.Text = "檢視套印樣板";
             this.lnkViewTemplate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkViewTemplate_LinkClicked);
@@ -72,7 +73,7 @@
             this.lnkChangeTemplate.Location = new System.Drawing.Point(112, 43);
             this.lnkChangeTemplate.Name = "lnkChangeTemplate";
             this.lnkChangeTemplate.Size = new System.Drawing.Size(86, 17);
-            this.lnkChangeTemplate.TabIndex = 14;
+            this.lnkChangeTemplate.TabIndex = 1;
             this.lnkChangeTemplate.TabStop = true;
             this.lnkChangeTemplate.Text = "變更套印樣板";
             this.lnkChangeTemplate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkChangeTemplate_LinkClicked);
@@ -84,11 +85,11 @@
             this.btnPrint.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
             this.btnPrint.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnPrint.Enabled = false;
-            this.btnPrint.Location = new System.Drawing.Point(331, 40);
+            this.btnPrint.Location = new System.Drawing.Point(425, 40);
             this.btnPrint.Name = "btnPrint";
             this.btnPrint.Size = new System.Drawing.Size(67, 23);
             this.btnPrint.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.btnPrint.TabIndex = 17;
+            this.btnPrint.TabIndex = 4;
             this.btnPrint.Text = "列印";
             this.btnPrint.Click += new System.EventHandler(this.btnPrint_Click);
             // 
@@ -98,19 +99,34 @@
             this.btnCancel.BackColor = System.Drawing.Color.Transparent;
             this.btnCancel.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(404, 40);
+            this.btnCancel.Location = new System.Drawing.Point(498, 40);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(67, 23);
             this.btnCancel.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.btnCancel.TabIndex = 18;
+            this.btnCancel.TabIndex = 5;
             this.btnCancel.Text = "離開";
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
+            // lnkDefault
+            // 
+            this.lnkDefault.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lnkDefault.AutoSize = true;
+            this.lnkDefault.BackColor = System.Drawing.Color.Transparent;
+            this.lnkDefault.Location = new System.Drawing.Point(320, 43);
+            this.lnkDefault.Name = "lnkDefault";
+            this.lnkDefault.Size = new System.Drawing.Size(86, 17);
+            this.lnkDefault.TabIndex = 3;
+            this.lnkDefault.TabStop = true;
+            this.lnkDefault.Text = "檢視預設樣板";
+            this.lnkDefault.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkDefault_LinkClicked);
             // 
             // ServiceReportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(497, 86);
+            this.ClientSize = new System.Drawing.Size(577, 86);
+            this.Controls.Add(this.lnkDefault);
             this.Controls.Add(this.lnkViewMapColumns);
             this.Controls.Add(this.lnkViewTemplate);
             this.Controls.Add(this.lnkChangeTemplate);
@@ -132,5 +148,6 @@
         private System.Windows.Forms.LinkLabel lnkChangeTemplate;
         private DevComponents.DotNetBar.ButtonX btnPrint;
         private DevComponents.DotNetBar.ButtonX btnCancel;
+        private System.Windows.Forms.LinkLabel lnkDefault;
     }
 }
