@@ -132,6 +132,12 @@
     <Compile Include="ServiceReportForm.Designer.cs">
       <DependentUpon>ServiceReportForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="SubmitForReviewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubmitForReviewForm.Designer.cs">
+      <DependentUpon>SubmitForReviewForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Library\Aspose.Cells_201402.dll" />
@@ -171,8 +177,12 @@
     <EmbeddedResource Include="ServiceReportForm.resx">
       <DependentUpon>ServiceReportForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="SubmitForReviewForm.resx">
+      <DependentUpon>SubmitForReviewForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Template\Template.xlsx" />
     <None Include="Template\屏東班級服務表現合併欄位總表.doc" />
     <None Include="Template\屏東班級服務表現樣板.doc" />
   </ItemGroup>

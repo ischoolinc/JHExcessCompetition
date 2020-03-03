@@ -63,6 +63,16 @@ namespace PingTungExcessCompetition.Properties {
         /// <summary>
         ///   查詢類型 System.Byte[] 的當地語系化資源。
         /// </summary>
+        internal static byte[] Template {
+            get {
+                object obj = ResourceManager.GetObject("Template", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Byte[] 的當地語系化資源。
+        /// </summary>
         internal static byte[] 屏東班級服務表現合併欄位總表 {
             get {
                 object obj = ResourceManager.GetObject("屏東班級服務表現合併欄位總表", resourceCulture);

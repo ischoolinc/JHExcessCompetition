@@ -12,7 +12,7 @@ namespace PingTungExcessCompetition
     {
         public Configure()
         {
-            
+
         }
 
         /// <summary>
@@ -27,6 +27,18 @@ namespace PingTungExcessCompetition
         [FISCA.UDT.Field]
         private string TemplateStream { get; set; }
         public Aspose.Words.Document Template { get; set; }
+
+        /// <summary>
+        /// 統計至日期
+        /// </summary>
+        [FISCA.UDT.Field]
+        public DateTime EndDate { get; set; }
+
+        /// <summary>
+        /// 對照表設定
+        /// </summary>
+        [FISCA.UDT.Field]
+        public string MappingContent { get; set; }
 
         /// <summary>
         /// 在儲存前，把資料填入儲存欄位中

@@ -232,9 +232,9 @@ namespace PingTungExcessCompetition
                     _Configure.Name = "屏東免試入學-班級服務表現";
                     _Configure.Template = new Document(new MemoryStream(Properties.Resources.屏東班級服務表現樣板));
                     _Configure.Encode();
-                    _Configure.Save();
+                   
                 }
-
+                _Configure.Save();
                 UserControlEnable(true);
             }
             catch (Exception ex)
