@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JHSchool.Data;
 
 namespace PingTungExcessCompetition.DAO
 {
@@ -86,6 +87,12 @@ namespace PingTungExcessCompetition.DAO
         /// 服務積分
         /// </summary>
         public int ServiceScore = 0;
+
+        /// <summary>
+        /// 均衡學習分數
+        /// </summary>
+        public int Semester5Score = 0;
+
 
         /// <summary>
         /// 計算成績
@@ -295,5 +302,25 @@ namespace PingTungExcessCompetition.DAO
             //if (HasScore3)
             //    ServiceScore += 2;
         }
+
+        public void CalcSemsScore5(List<JHSemesterScoreRecord> SemsScoreList)
+        {
+            Semester5Score = 0;
+            
+            // 1. 本項基本條件為國中健康體育、藝術人文、綜合活動等三個領域五學期平均成績達及格者。
+            // 2.符合基本條件單領域五學期平均成績達及格以上者，計 3 分。
+            // 3.符合基本條件 2 領域五學期平均成績達及格以上者，計 6 分。
+            // 4.符合基本條件 3 領域五學期平均成
+            //績達及格以上者，計 9 分。"
+
+            foreach(JHSemesterScoreRecord semsRec in SemsScoreList)
+            {
+
+            }
+
+
+        }
+
+
     }
 }

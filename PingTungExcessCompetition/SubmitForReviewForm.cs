@@ -13,6 +13,7 @@ using System.IO;
 using FISCA.UDT;
 using System.Xml.Linq;
 using PingTungExcessCompetition.DAO;
+using JHSchool.Data;
 
 namespace PingTungExcessCompetition
 {
@@ -99,7 +100,7 @@ namespace PingTungExcessCompetition
                         }
                     }
 
-                    dtDate.Enabled = btnExport.Enabled = true;
+                    UserControlEnable(true);
                 }
                 catch (Exception ex)
                 {
@@ -126,12 +127,128 @@ namespace PingTungExcessCompetition
                 // 取得學生基本資料
                 List<StudentInfo> StudentInfoList = QueryData.GetStudentInfoList3();
 
+                List<string> StudentIDList = new List<string>();
+                foreach (StudentInfo si in StudentInfoList)
+                {
+                    StudentIDList.Add(si.StudentID);
+                }
+
+                // 取得地址資訊
+                Dictionary<string, JHAddressRecord> AddressDict = new Dictionary<string, JHAddressRecord>();
+                List<JHAddressRecord> tmpAddress = JHAddress.SelectByStudentIDs(StudentIDList);
+                foreach (JHAddressRecord rec in tmpAddress)
+                {
+                    if (!AddressDict.ContainsKey(rec.RefStudentID))
+                        AddressDict.Add(rec.RefStudentID, rec);
+                }
+
+                // 取得電話資料
+                Dictionary<string, JHPhoneRecord> PhoneDict = new Dictionary<string, JHPhoneRecord>();
+                List<JHPhoneRecord> tmpPhone = JHPhone.SelectByStudentIDs(StudentIDList);
+                foreach (JHPhoneRecord rec in tmpPhone)
+                {
+                    if (!PhoneDict.ContainsKey(rec.RefStudentID))
+                        PhoneDict.Add(rec.RefStudentID, rec);
+                }
+
+                bgWorkerExport.ReportProgress(20);
+
+                // 取得監護人父母資訊
+                Dictionary<string, JHParentRecord> ParentDict = new Dictionary<string, JHParentRecord>();
+                List<JHParentRecord> tmpParent = JHParent.SelectByStudentIDs(StudentIDList);
+                foreach (JHParentRecord rec in tmpParent)
+                {
+                    if (!ParentDict.ContainsKey(rec.RefStudentID))
+                        ParentDict.Add(rec.RefStudentID, rec);
+                }
+
+                // 轉換各項類別對照值
+                Dictionary<string, string> MappingTag1 = new Dictionary<string, string>();
+                Dictionary<string, string> MappingTag2 = new Dictionary<string, string>();
+                Dictionary<string, string> MappingTag3 = new Dictionary<string, string>();
+                Dictionary<string, string> MappingTag4 = new Dictionary<string, string>();
+
+                // 取得學生類別
+                Dictionary<string, List<string>> StudentTagDict = QueryData.GetStudentTagName(StudentIDList);
+
+                // 解析對照設定
+                XElement elmRoot = XElement.Parse(_Configure.MappingContent);
+                if (elmRoot != null)
+                {
+                    foreach (XElement elm in elmRoot.Elements("Group"))
+                    {
+                        string gpName = elm.Attribute("Name").Value;
+                        if (gpName == "學生身分")
+                        {
+                            foreach (XElement elm1 in elm.Elements("Item"))
+                            {
+                                string tagName = elm1.Attribute("TagName").Value;
+                                if (!MappingTag1.ContainsKey(tagName) && tagName.Length > 0)
+                                    MappingTag1.Add(tagName, elm1.Attribute("Code").Value);
+                            }
+                        }
+
+                        if (gpName == "身心障礙")
+                        {
+                            foreach (XElement elm1 in elm.Elements("Item"))
+                            {
+                                string tagName = elm1.Attribute("TagName").Value;
+                                if (!MappingTag2.ContainsKey(tagName) && tagName.Length > 0)
+                                    MappingTag2.Add(tagName, elm1.Attribute("Code").Value);
+                            }
+                        }
+
+                        if (gpName == "學生報名身分設定")
+                        {
+                            foreach (XElement elm1 in elm.Elements("Item"))
+                            {
+                                string tagName = elm1.Attribute("TagName").Value;
+                                if (!MappingTag3.ContainsKey(tagName) && tagName.Length > 0)
+                                    MappingTag3.Add(tagName, elm1.Attribute("Code").Value);
+                            }
+                        }
+
+                        if (gpName == "失業勞工子女")
+                        {
+                            foreach (XElement elm1 in elm.Elements("Item"))
+                            {
+                                string tagName = elm1.Attribute("TagName").Value;
+                                if (!MappingTag4.ContainsKey(tagName) && tagName.Length > 0)
+                                    MappingTag4.Add(tagName, elm1.Attribute("Code").Value);
+                            }
+                        }
+                    }
+                }
+
+
+                // 取得語言認證學生id
+                List<string> hasLanguageCertificateIDList = QueryData.GetLanguageCertificate(StudentIDList);
+
+                bgWorkerExport.ReportProgress(40);
+
+                // 取得成績相關資料
+                Dictionary<string, List<JHSemesterScoreRecord>> SemesterScoreRecordDict = new Dictionary<string, List<JHSemesterScoreRecord>>();
+                List<JHSemesterScoreRecord> tmpSemsScore = JHSemesterScore.SelectByStudentIDs(StudentIDList);
+                foreach (JHSemesterScoreRecord rec in tmpSemsScore)
+                {
+                    if (!SemesterScoreRecordDict.ContainsKey(rec.RefStudentID))
+                        SemesterScoreRecordDict.Add(rec.RefStudentID, new List<JHSemesterScoreRecord>());
+
+                    SemesterScoreRecordDict[rec.RefStudentID].Add(rec);
+                }
 
 
 
                 // 填入 Excel 資料
                 int wstRIdx = 1;
-                foreach(StudentInfo si in StudentInfoList)
+
+                int d18 = 0, d19 = 0, d30 = 0, d31 = 0, d32 = 0, d33 = 0, d34 = 0, d35 = 0;
+
+
+
+                bgWorkerExport.ReportProgress(70);
+
+                foreach (StudentInfo si in StudentInfoList)
                 {
 
                     // 考區代碼 0， 12/屏東考區
@@ -152,33 +269,163 @@ namespace PingTungExcessCompetition
                     wst.Cells[wstRIdx, 7].PutValue(si.IDNumber);
 
                     // 性別 8
+                    wst.Cells[wstRIdx, 8].PutValue(si.GenderCode);
+
                     // 出生年(民國年) 9
+                    wst.Cells[wstRIdx, 9].PutValue(si.BirthYear);
                     // 出生月 10
+                    wst.Cells[wstRIdx, 10].PutValue(si.BirthMonth);
                     // 出生日 11
+                    wst.Cells[wstRIdx, 11].PutValue(si.BirthDay);
                     // 畢業學校代碼 12
+                    wst.Cells[wstRIdx, 12].PutValue(K12.Data.School.Code);
+
                     // 畢業年(民國年) 13
+                    wst.Cells[wstRIdx, 13].PutValue(K12.Data.School.DefaultSchoolYear);
+
                     // 畢肄業 14
-                    // 學生身分 15
-                    // 身心障礙 16
+                    wst.Cells[wstRIdx, 14].PutValue(1);
+
+
+
+
+
                     // 就學區 17
+
                     // 低收入戶 18
+                    d18 = 0;
+                    wst.Cells[wstRIdx, 18].PutValue(d18);
+
                     // 中低收入戶 19
-                    // 失業勞工子女 20
+                    d19 = 0;
+                    wst.Cells[wstRIdx, 19].PutValue(d19);
+
+                    wst.Cells[wstRIdx, 15].PutValue("0");
+                    wst.Cells[wstRIdx, 16].PutValue("0");
+                    wst.Cells[wstRIdx, 20].PutValue("0");
+                    wst.Cells[wstRIdx, 28].PutValue("0");
+
+                    if (StudentTagDict.ContainsKey(si.StudentID))
+                    {
+                        foreach (string tagName in StudentTagDict[si.StudentID])
+                        {
+                            if (MappingTag1.ContainsKey(tagName))
+                            {
+                                // 學生身分 15                                
+                                wst.Cells[wstRIdx, 15].PutValue(MappingTag1[tagName]);
+                            }
+
+                            if (MappingTag2.ContainsKey(tagName))
+                            {
+                                // 身心障礙 16                               
+                                wst.Cells[wstRIdx, 16].PutValue(MappingTag2[tagName]);
+                            }
+
+                            if (MappingTag3.ContainsKey(tagName))
+                            {
+                                // 學生報名身分 28                               
+                                wst.Cells[wstRIdx, 28].PutValue(MappingTag3[tagName]);
+
+                            }
+                            if (MappingTag4.ContainsKey(tagName))
+                            {
+                                // 失業勞工子女 20                              
+                                wst.Cells[wstRIdx, 20].PutValue(MappingTag4[tagName]);
+                            }
+                        }
+
+                    }
+
+
+
                     // 資料授權 21
+                    wst.Cells[wstRIdx, 21].PutValue(0);
+
+                    string parentName = "";
+
+
                     // 家長姓名 22
+                    if (ParentDict.ContainsKey(si.StudentID))
+                    {
+
+                        if (!string.IsNullOrWhiteSpace(ParentDict[si.StudentID].CustodianName))
+                        {
+                            parentName = ParentDict[si.StudentID].CustodianName;
+                        }
+                        else if (!string.IsNullOrWhiteSpace(ParentDict[si.StudentID].FatherName))
+                        {
+                            parentName = ParentDict[si.StudentID].FatherName;
+                        }
+                        else if (!string.IsNullOrWhiteSpace(ParentDict[si.StudentID].MotherName))
+                        {
+                            parentName = ParentDict[si.StudentID].MotherName;
+                        }
+                        else
+                        {
+
+                        }
+                        wst.Cells[wstRIdx, 22].PutValue(parentName);
+                    }
+
+
                     // 市內電話 23
                     // 行動電話 24
+                    if (PhoneDict.ContainsKey(si.StudentID))
+                    {
+                        wst.Cells[wstRIdx, 23].PutValue(PhoneDict[si.StudentID].Contact);
+                        wst.Cells[wstRIdx, 24].PutValue(PhoneDict[si.StudentID].Cell);
+                    }
+
+
                     // 郵遞區號 25
-                    // 通訊地址 26
+                    if (AddressDict.ContainsKey(si.StudentID))
+                    {
+                        wst.Cells[wstRIdx, 25].PutValue(AddressDict[si.StudentID].MailingZipCode);
+
+                        // 通訊地址 26
+                        wst.Cells[wstRIdx, 26].PutValue(AddressDict[si.StudentID].MailingCounty + AddressDict[si.StudentID].MailingTown + AddressDict[si.StudentID].MailingDistrict + AddressDict[si.StudentID].MailingArea + AddressDict[si.StudentID].MailingDetail);
+
+                    }
                     // 非中華民國身分證號 27
-                    // 學生報名身分 28
+
+
+
                     // 市內電話分機 29
+
                     // 均衡學習 30
+                    // 計算分數
+                    d30 = 0;
+                    wst.Cells[wstRIdx, 30].PutValue(d30);
+
                     // 服務表現 31
+                    d31 = 0;
+                    wst.Cells[wstRIdx, 31].PutValue(d31);
+
                     // 品德表現 32
+                    d32 = 0;
+                    wst.Cells[wstRIdx, 32].PutValue(d32);
+
                     // 競賽表現 33
+                    d33 = 0;
+                    wst.Cells[wstRIdx, 33].PutValue(d33);
+
                     // 體適能 34
+                    d34 = 0;
+                    wst.Cells[wstRIdx, 34].PutValue(d34);
+
                     // 本土語言認證 35
+                    if (hasLanguageCertificateIDList.Contains(si.StudentID))
+                    {
+                        wst.Cells[wstRIdx, 35].PutValue(1);
+                    }
+                    else
+                    {
+                        wst.Cells[wstRIdx, 35].PutValue(0);
+                    }
+
+
+
+                    // 36~39 系統無法提供先空
                     // 適性發展_高中 36
                     // 適性發展_高職 37
                     // 適性發展_綜合高中 38
@@ -209,29 +456,36 @@ namespace PingTungExcessCompetition
         {
             // 取得畫面上日期
             _Configure.EndDate = dtDate.Value;
-            dtDate.Enabled = false;
-            btnExport.Enabled = false;
-            bgWorkerExport.RunWorkerAsync();
-
+            if (SaveConfig())
+            {
+                UserControlEnable(false);
+                bgWorkerExport.RunWorkerAsync();
+            }
         }
+
 
         private void SubmitForReviewForm_Load(object sender, EventArgs e)
         {
             this.MaximumSize = this.MinimumSize = this.Size;
 
-            btnSave.Enabled = btnExport.Enabled = dtDate.Enabled = false;
+            UserControlEnable(false);
 
             LoadTemplate();
             dtDate.Value = _Configure.EndDate;
             LoadStudentTag();
             LoadConfig();
 
-            btnSave.Enabled = btnExport.Enabled = dtDate.Enabled = true;
+            UserControlEnable(true);
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            SaveConfig();
+            UserControlEnable(false);
+            if (SaveConfig())
+            {
+                MsgBox.Show("儲存完成。");
+            }
+            UserControlEnable(true);
         }
 
 
@@ -343,9 +597,8 @@ namespace PingTungExcessCompetition
         /// <summary>
         /// 儲存設定檔
         /// </summary>
-        private void SaveConfig()
+        private bool SaveConfig()
         {
-            btnSave.Enabled = false;
             try
             {
                 // 收集資料回存
@@ -411,7 +664,7 @@ namespace PingTungExcessCompetition
                         {
                             foreach (XElement elm1 in elm.Elements("Item"))
                             {
-                                elm.SetAttributeValue("TagName", cboSelectTag4.Text);
+                                elm1.SetAttributeValue("TagName", cboSelectTag4.Text);
 
                             }
                         }
@@ -419,13 +672,14 @@ namespace PingTungExcessCompetition
                 }
                 _Configure.MappingContent = elmRoot.ToString();
                 _Configure.Save();
-                MsgBox.Show("儲存完成。");
-                btnSave.Enabled = true;
+
+                return true;
+
             }
             catch (Exception ex)
             {
                 MsgBox.Show("寫入設定失敗," + ex.Message);
-                btnSave.Enabled = true;
+                return false;
             }
         }
 
@@ -595,8 +849,7 @@ namespace PingTungExcessCompetition
 
         private void UserControlEnable(bool value)
         {
-            btnSave.Enabled = value;
-            btnExport.Enabled = value;
+            dgData1.Enabled = dgData2.Enabled = dgData3.Enabled = cboSelectTag4.Enabled = dtDate.Enabled = btnSave.Enabled = btnExport.Enabled = value;
         }
     }
 }

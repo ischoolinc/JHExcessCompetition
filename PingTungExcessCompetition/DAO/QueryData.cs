@@ -289,6 +289,45 @@ WHERE category =  'Student' ORDER BY prefix,name";
 
 
         /// <summary>
+        /// 取得學生 return idprefix:name
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string, List<string>> GetStudentTagName(List<string> studIDList)
+        {
+
+            Dictionary<string, List<string>> value = new Dictionary<string, List<string>>();
+
+            if (studIDList.Count > 0)
+            {
+                QueryHelper qh = new QueryHelper();
+                string qry = @"SELECT 
+ref_student_id AS student_id
+,(CASE WHEN prefix is null THEN name ELSE prefix||':'||name END) AS tag_name 
+FROM 
+tag INNER JOIN tag_student ON tag.id = tag_student.ref_tag_id
+WHERE ref_student_id IN(" + string.Join(",", studIDList.ToArray()) + @") AND category =  'Student' ORDER BY ref_student_id,prefix,name
+";
+
+                DataTable dt = qh.Select(qry);
+                if (dt != null)
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        string id = dr["student_id"].ToString();
+                        string tagName = dr["tag_name"].ToString();
+
+                        if (!value.ContainsKey(id))
+                            value.Add(id, new List<string>());
+
+                        value[id].Add(tagName);
+                    }
+                }
+            }
+            return value;
+        }
+
+
+        /// <summary>
         /// 取得三年級一般狀態學生資料
         /// </summary>
         /// <returns></returns>
@@ -306,7 +345,8 @@ SELECT
     ,student.name AS student_name
     ,id_number
     ,birthdate
-    ,CASE gender WHEN '0' THEN '2' WHEN '1' THEN '1' ELSE '' END AS gender 
+    ,CASE gender WHEN '0' THEN '2' WHEN '1' THEN '1' ELSE '' END AS gender
+    ,sems_history
 FROM 
 student INNER JOIN class 
 ON student.ref_class_id = class.id 
@@ -326,7 +366,40 @@ ORDER BY class.grade_year,class.display_order,class.class_name,seat_no
                     si.SeatNo = dr["seat_no"].ToString();
                     si.StudentName = dr["student_name"].ToString();
                     si.IDNumber = dr["id_number"].ToString();
+                    si.GenderCode = dr["gender"].ToString();
+                    DateTime dt1;
+                    if (DateTime.TryParse(dr["birthdate"].ToString(), out dt1))
+                    {
+                        si.BirthYear = (dt1.Year - 1911) + "";
+                        si.BirthMonth = dt1.Month + "";
+                        si.BirthDay = dt1.Day + "";
+                    }
 
+                    // 處理學期歷程
+                    if (dr["sems_history"] != null)
+                    {
+                        try
+                        {
+                            XElement elms = XElement.Parse("<root>" + dr["sems_history"].ToString() + "</root>");
+                            foreach (XElement elm in elms.Elements("History"))
+                            {
+                                SemsHistoryInfo shi = new SemsHistoryInfo();
+                                if (elm.Attribute("SchoolYear") != null)
+                                    shi.SchoolYear = elm.Attribute("SchoolYear").Value;
+
+                                if (elm.Attribute("Semester") != null)
+                                    shi.Semester = elm.Attribute("Semester").Value;
+
+                                if (elm.Attribute("GradeYear") != null)
+                                    shi.GradeYear = elm.Attribute("GradeYear").Value;
+
+                                si.SemsHistoryInfoList.Add(shi);
+                            }
+
+                        }
+                        catch (Exception ex) { }
+
+                    }
 
                     value.Add(si);
                 }
@@ -334,5 +407,36 @@ ORDER BY class.grade_year,class.display_order,class.class_name,seat_no
             return value;
         }
 
+        /// <summary>
+        /// 有取得語言認證學生ID
+        /// </summary>
+        /// <param name="studIDList"></param>
+        /// <returns></returns>
+        public static List<string> GetLanguageCertificate(List<string> studIDList)
+        {
+            List<string> value = new List<string>();
+            if (studIDList.Count > 0)
+            {
+                QueryHelper qh = new QueryHelper();
+                string qry = @"
+SELECT refid AS student_id 
+FROM 
+$stud.userdefinedata 
+WHERE fieldname = '語言認證' AND value = '是' AND refid IN('" + string.Join("','", studIDList.ToArray()) + "') ";
+
+                DataTable dt = qh.Select(qry);
+                if (dt != null)
+                {
+                    foreach(DataRow dr in dt.Rows)
+                    {
+                        string sid = dr["student_id"].ToString();
+                        if (!value.Contains(sid))
+                            value.Add(sid);
+                    }
+                }
+            }
+
+            return value;
+        }
     }
 }
