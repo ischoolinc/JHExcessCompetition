@@ -12,6 +12,7 @@ using Aspose.Cells;
 using System.IO;
 using FISCA.UDT;
 using System.Xml.Linq;
+using PingTungExcessCompetition.DAO;
 
 namespace PingTungExcessCompetition
 {
@@ -20,7 +21,8 @@ namespace PingTungExcessCompetition
         BackgroundWorker bgWorkerExport = new BackgroundWorker();
         public Configure _Configure { get; private set; }
         AccessHelper _accessHelper = new AccessHelper();
-    
+        Dictionary<string, string> StudentCanSelectTagDict = new Dictionary<string, string>();
+
 
         public SubmitForReviewForm()
         {
@@ -118,7 +120,72 @@ namespace PingTungExcessCompetition
             {
                 // 取得預設樣板
                 Workbook wb = new Workbook(new MemoryStream(Properties.Resources.Template));
+                Worksheet wst = wb.Worksheets[0];
 
+
+                // 取得學生基本資料
+                List<StudentInfo> StudentInfoList = QueryData.GetStudentInfoList3();
+
+
+
+
+                // 填入 Excel 資料
+                int wstRIdx = 1;
+                foreach(StudentInfo si in StudentInfoList)
+                {
+
+                    // 考區代碼 0， 12/屏東考區
+                    wst.Cells[wstRIdx, 0].PutValue(12);
+                    // 集報單位代碼 1,學校代碼
+                    wst.Cells[wstRIdx, 1].PutValue(K12.Data.School.Code);
+                    // 序號 2
+                    wst.Cells[wstRIdx, 2].PutValue(wstRIdx);
+                    // 學號 3                    
+                    wst.Cells[wstRIdx, 3].PutValue(si.StudentNumber);
+                    // 班級 4
+                    wst.Cells[wstRIdx, 4].PutValue(si.ClassName);
+                    // 座號 5
+                    wst.Cells[wstRIdx, 5].PutValue(si.SeatNo);
+                    // 學生姓名 6
+                    wst.Cells[wstRIdx, 6].PutValue(si.StudentName);
+                    // 身分證統一編號 7
+                    wst.Cells[wstRIdx, 7].PutValue(si.IDNumber);
+
+                    // 性別 8
+                    // 出生年(民國年) 9
+                    // 出生月 10
+                    // 出生日 11
+                    // 畢業學校代碼 12
+                    // 畢業年(民國年) 13
+                    // 畢肄業 14
+                    // 學生身分 15
+                    // 身心障礙 16
+                    // 就學區 17
+                    // 低收入戶 18
+                    // 中低收入戶 19
+                    // 失業勞工子女 20
+                    // 資料授權 21
+                    // 家長姓名 22
+                    // 市內電話 23
+                    // 行動電話 24
+                    // 郵遞區號 25
+                    // 通訊地址 26
+                    // 非中華民國身分證號 27
+                    // 學生報名身分 28
+                    // 市內電話分機 29
+                    // 均衡學習 30
+                    // 服務表現 31
+                    // 品德表現 32
+                    // 競賽表現 33
+                    // 體適能 34
+                    // 本土語言認證 35
+                    // 適性發展_高中 36
+                    // 適性發展_高職 37
+                    // 適性發展_綜合高中 38
+                    // 適性發展_五專 39
+
+                    wstRIdx++;
+                }
 
                 bgWorkerExport.ReportProgress(100);
 
@@ -151,8 +218,15 @@ namespace PingTungExcessCompetition
         private void SubmitForReviewForm_Load(object sender, EventArgs e)
         {
             this.MaximumSize = this.MinimumSize = this.Size;
+
+            btnSave.Enabled = btnExport.Enabled = dtDate.Enabled = false;
+
             LoadTemplate();
             dtDate.Value = _Configure.EndDate;
+            LoadStudentTag();
+            LoadConfig();
+
+            btnSave.Enabled = btnExport.Enabled = dtDate.Enabled = true;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -160,12 +234,199 @@ namespace PingTungExcessCompetition
             SaveConfig();
         }
 
+
+        private void LoadConfig()
+        {
+            dgData1.Rows.Clear();
+            dgData2.Rows.Clear();
+            dgData3.Rows.Clear();
+
+            if (_Configure != null)
+            {
+                try
+                {
+                    XElement elmRoot = XElement.Parse(_Configure.MappingContent);
+                    if (elmRoot != null)
+                    {
+                        foreach (XElement elm in elmRoot.Elements("Group"))
+                        {
+                            string gpName = elm.Attribute("Name").Value;
+                            if (gpName == "學生身分")
+                            {
+                                foreach (XElement elm1 in elm.Elements("Item"))
+                                {
+                                    int rowIdx = dgData1.Rows.Add();
+                                    dgData1.Rows[rowIdx].Cells[colCode1.Index].Value = elm1.Attribute("Code").Value;
+                                    dgData1.Rows[rowIdx].Cells[colItem1.Index].Value = elm1.Attribute("Name").Value;
+                                    dgData1.Rows[rowIdx].Cells[2].Value = elm1.Attribute("TagName").Value;
+                                }
+                            }
+
+                            if (gpName == "身心障礙")
+                            {
+                                foreach (XElement elm1 in elm.Elements("Item"))
+                                {
+                                    int rowIdx = dgData2.Rows.Add();
+                                    dgData2.Rows[rowIdx].Cells[colCode1.Index].Value = elm1.Attribute("Code").Value;
+                                    dgData2.Rows[rowIdx].Cells[colItem1.Index].Value = elm1.Attribute("Name").Value;
+                                    dgData2.Rows[rowIdx].Cells[2].Value = elm1.Attribute("TagName").Value;
+                                }
+                            }
+
+                            if (gpName == "學生報名身分設定")
+                            {
+                                foreach (XElement elm1 in elm.Elements("Item"))
+                                {
+                                    int rowIdx = dgData3.Rows.Add();
+                                    dgData3.Rows[rowIdx].Cells[colCode1.Index].Value = elm1.Attribute("Code").Value;
+                                    dgData3.Rows[rowIdx].Cells[colItem1.Index].Value = elm1.Attribute("Name").Value;
+                                    dgData3.Rows[rowIdx].Cells[2].Value = elm1.Attribute("TagName").Value;
+                                }
+                            }
+
+                            if (gpName == "失業勞工子女")
+                            {
+                                foreach (XElement elm1 in elm.Elements("Item"))
+                                {
+                                    cboSelectTag4.Text = elm1.Attribute("TagName").Value;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MsgBox.Show("解析設定檔失敗," + ex.Message);
+                }
+            }
+
+        }
+
+
+        /// <summary>
+        /// 載入學生可選類別
+        /// </summary>
+        private void LoadStudentTag()
+        {
+            StudentCanSelectTagDict = QueryData.GetStudentAllTag();
+
+            cboSelectTag4.Items.Clear();
+            DataGridViewComboBoxColumn cboItem1 = new DataGridViewComboBoxColumn();
+            cboItem1.Name = "colStudTag1";
+            cboItem1.Width = 150;
+            cboItem1.HeaderText = "學生類別";
+
+            DataGridViewComboBoxColumn cboItem2 = new DataGridViewComboBoxColumn();
+            cboItem2.Name = "colStudTag1";
+            cboItem2.Width = 150;
+            cboItem2.HeaderText = "學生類別";
+
+            DataGridViewComboBoxColumn cboItem3 = new DataGridViewComboBoxColumn();
+            cboItem3.Name = "colStudTag1";
+            cboItem3.Width = 150;
+            cboItem3.HeaderText = "學生類別";
+
+            foreach (string name in StudentCanSelectTagDict.Values)
+            {
+                cboItem1.Items.Add(name);
+                cboItem2.Items.Add(name);
+                cboItem3.Items.Add(name);
+
+                cboSelectTag4.Items.Add(name);
+            }
+
+            dgData1.Columns.Add(cboItem1);
+            dgData2.Columns.Add(cboItem2);
+            dgData3.Columns.Add(cboItem3);
+        }
+
         /// <summary>
         /// 儲存設定檔
         /// </summary>
         private void SaveConfig()
         {
+            btnSave.Enabled = false;
+            try
+            {
+                // 收集資料回存
+                XElement elmRoot = XElement.Parse(_Configure.MappingContent);
+                if (elmRoot != null)
+                {
+                    foreach (XElement elm in elmRoot.Elements("Group"))
+                    {
+                        string gpName = elm.Attribute("Name").Value;
+                        if (gpName == "學生身分")
+                        {
 
+                            foreach (DataGridViewRow drv in dgData1.Rows)
+                            {
+                                if (drv.IsNewRow)
+                                    continue;
+                                foreach (XElement elm1 in elm.Elements("Item"))
+                                {
+                                    string name = elm1.Attribute("Name").Value;
+                                    if (name == drv.Cells[colItem1.Index].Value.ToString())
+                                    {
+                                        elm1.SetAttributeValue("TagName", drv.Cells[2].Value.ToString());
+                                    }
+                                }
+                            }
+                        }
+
+                        if (gpName == "身心障礙")
+                        {
+                            foreach (DataGridViewRow drv in dgData2.Rows)
+                            {
+                                if (drv.IsNewRow)
+                                    continue;
+                                foreach (XElement elm1 in elm.Elements("Item"))
+                                {
+                                    string name = elm1.Attribute("Name").Value;
+                                    if (name == drv.Cells[colItem1.Index].Value.ToString())
+                                    {
+                                        elm1.SetAttributeValue("TagName", drv.Cells[2].Value.ToString());
+                                    }
+                                }
+                            }
+                        }
+
+                        if (gpName == "學生報名身分設定")
+                        {
+                            foreach (DataGridViewRow drv in dgData3.Rows)
+                            {
+                                if (drv.IsNewRow)
+                                    continue;
+                                foreach (XElement elm1 in elm.Elements("Item"))
+                                {
+                                    string name = elm1.Attribute("Name").Value;
+                                    if (name == drv.Cells[colItem1.Index].Value.ToString())
+                                    {
+                                        elm1.SetAttributeValue("TagName", drv.Cells[2].Value.ToString());
+                                    }
+                                }
+                            }
+                        }
+
+                        if (gpName == "失業勞工子女")
+                        {
+                            foreach (XElement elm1 in elm.Elements("Item"))
+                            {
+                                elm.SetAttributeValue("TagName", cboSelectTag4.Text);
+
+                            }
+                        }
+                    }
+                }
+                _Configure.MappingContent = elmRoot.ToString();
+                _Configure.Save();
+                MsgBox.Show("儲存完成。");
+                btnSave.Enabled = true;
+            }
+            catch (Exception ex)
+            {
+                MsgBox.Show("寫入設定失敗," + ex.Message);
+                btnSave.Enabled = true;
+            }
         }
 
         private void LoadTemplate()

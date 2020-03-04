@@ -166,7 +166,7 @@ SELECT
                     }
                 }
 
-             
+
                 // 班級幹部限制
                 List<string> CadreName1 = new List<string>();
                 CadreName1.Add("班長");
@@ -253,6 +253,84 @@ SELECT
                 throw ex;
             }
 
+            return value;
+        }
+
+
+        /// <summary>
+        /// 取得學生所有可選類別 return idprefix:name
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string, string> GetStudentAllTag()
+        {
+            Dictionary<string, string> value = new Dictionary<string, string>();
+            QueryHelper qh = new QueryHelper();
+            string qry = @"SELECT 
+id
+,(CASE WHEN prefix is null THEN name ELSE prefix||':'||name END) AS tag_name 
+FROM 
+tag 
+WHERE category =  'Student' ORDER BY prefix,name";
+
+            DataTable dt = qh.Select(qry);
+            if (dt != null)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    string id = dr["id"].ToString();
+                    string tagName = dr["tag_name"].ToString();
+
+                    if (!value.ContainsKey(tagName))
+                        value.Add(id, tagName);
+                }
+            }
+            return value;
+        }
+
+
+        /// <summary>
+        /// 取得三年級一般狀態學生資料
+        /// </summary>
+        /// <returns></returns>
+        public static List<StudentInfo> GetStudentInfoList3()
+        {
+            List<StudentInfo> value = new List<StudentInfo>();
+            QueryHelper qh = new QueryHelper();
+            string qry = @"
+SELECT 
+    student.id AS student_id
+    ,class.id AS class_id
+    ,student_number
+    ,class.class_name
+    ,seat_no
+    ,student.name AS student_name
+    ,id_number
+    ,birthdate
+    ,CASE gender WHEN '0' THEN '2' WHEN '1' THEN '1' ELSE '' END AS gender 
+FROM 
+student INNER JOIN class 
+ON student.ref_class_id = class.id 
+WHERE student.status = 1 AND class.grade_year IN(3,9) 
+ORDER BY class.grade_year,class.display_order,class.class_name,seat_no
+";
+            DataTable dt = qh.Select(qry);
+            if (dt != null)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    StudentInfo si = new StudentInfo();
+                    si.StudentID = dr["student_id"].ToString();
+                    si.ClassID = dr["class_id"].ToString();
+                    si.StudentNumber = dr["student_number"].ToString();
+                    si.ClassName = dr["class_name"].ToString();
+                    si.SeatNo = dr["seat_no"].ToString();
+                    si.StudentName = dr["student_name"].ToString();
+                    si.IDNumber = dr["id_number"].ToString();
+
+
+                    value.Add(si);
+                }
+            }
             return value;
         }
 

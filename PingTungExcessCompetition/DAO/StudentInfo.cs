@@ -14,7 +14,32 @@ namespace PingTungExcessCompetition.DAO
 
         public string StudentName { get; set; }
 
+        public string ClassName { get; set; }
+
         public string SeatNo { get; set; }
+
+        public string StudentNumber { get; set; }
+
+        public string IDNumber { get; set; }
+
+        /// <summary>
+        /// 出生年
+        /// </summary>
+        public string BirthYear { get; set; }
+        /// <summary>
+        /// 出生月
+        /// </summary>
+        public string BirthMonth { get; set; }
+        /// <summary>
+        /// 出生日
+        /// </summary>
+        public string BirthDay { get; set; }
+
+        /// <summary>
+        /// 報考男女代碼 男1，女 2
+        /// </summary>
+        public string GenderCode { get; set; }
+
 
         public bool HasScore1 = false;
         public bool HasScore2 = false;
