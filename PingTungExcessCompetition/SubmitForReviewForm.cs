@@ -237,16 +237,59 @@ namespace PingTungExcessCompetition
                     SemesterScoreRecordDict[rec.RefStudentID].Add(rec);
                 }
 
+                // 取得功過紀錄
+                // 功過對照表
+                JHMeritDemeritReduceRecord DemeritReduceRecord = JHMeritDemeritReduce.Select();
+                // 懲
+                Dictionary<string, List<JHDemeritRecord>> DemeritRecordDict = new Dictionary<string, List<JHDemeritRecord>>();
+                List<JHDemeritRecord> tmpDemeritRecord = JHDemerit.SelectByStudentIDs(StudentIDList);
+                foreach (JHDemeritRecord rec in tmpDemeritRecord)
+                {
+                    if (rec.Cleared == "是")
+                        continue;
 
+                    if (rec.RegisterDate.HasValue)
+                    {
+                        if (rec.RegisterDate.Value > _Configure.EndDate)
+                            continue;
+                        else
+                        {
+                            if (!DemeritRecordDict.ContainsKey(rec.RefStudentID))
+                                DemeritRecordDict.Add(rec.RefStudentID, new List<JHDemeritRecord>());
 
+                            DemeritRecordDict[rec.RefStudentID].Add(rec);
+                        }
+                    }
+                }
+                // 獎
+                Dictionary<string, List<JHMeritRecord>> MeritRecordDict = new Dictionary<string, List<JHMeritRecord>>();
+                List<JHMeritRecord> tmpMeritRecord = JHMerit.SelectByStudentIDs(StudentIDList);
+                foreach (JHMeritRecord rec in tmpMeritRecord)
+                {
+                    if (rec.RegisterDate.HasValue)
+                    {
+                        if (rec.RegisterDate.Value > _Configure.EndDate)
+                            continue;
+                        else
+                        {
+                            if (!MeritRecordDict.ContainsKey(rec.RefStudentID))
+                                MeritRecordDict.Add(rec.RefStudentID, new List<JHMeritRecord>());
+
+                            MeritRecordDict[rec.RefStudentID].Add(rec);
+                        }
+                    }
+                }
                 // 填入 Excel 資料
                 int wstRIdx = 1;
 
-                int d18 = 0, d19 = 0, d30 = 0, d31 = 0, d32 = 0, d33 = 0, d34 = 0, d35 = 0;
+                int d18 = 0, d19 = 0, d31 = 0, d32 = 0, d33 = 0, d34 = 0;
 
 
 
                 bgWorkerExport.ReportProgress(70);
+
+                // 幹部限制
+                List<string> CadreName1 = Global.GetCadreName1();
 
                 foreach (StudentInfo si in StudentInfoList)
                 {
@@ -285,9 +328,6 @@ namespace PingTungExcessCompetition
 
                     // 畢肄業 14
                     wst.Cells[wstRIdx, 14].PutValue(1);
-
-
-
 
 
                     // 就學區 17
@@ -394,16 +434,36 @@ namespace PingTungExcessCompetition
 
                     // 均衡學習 30
                     // 計算分數
-                    d30 = 0;
-                    wst.Cells[wstRIdx, 30].PutValue(d30);
+                    if (SemesterScoreRecordDict.ContainsKey(si.StudentID))
+                    {
+                        si.CalcSemsScore5(SemesterScoreRecordDict[si.StudentID]);
+                        // 成績滿5學期才顯示
+                        if (si.hasSemester5Score)
+                            wst.Cells[wstRIdx, 30].PutValue(si.Semester5Score);
+                    }
 
                     // 服務表現 31
-                    d31 = 0;
-                    wst.Cells[wstRIdx, 31].PutValue(d31);
+                    si.CalcCadreScore(CadreName1);
+                    wst.Cells[wstRIdx, 31].PutValue(si.ServiceScore);
 
                     // 品德表現 32
-                    d32 = 0;
-                    wst.Cells[wstRIdx, 32].PutValue(d32);
+                    if (DemeritRecordDict.ContainsKey(si.StudentID))
+                    {
+                        if (MeritRecordDict.ContainsKey(si.StudentID))
+                        {
+                            si.CalcDemeritMemeritScore(DemeritRecordDict[si.StudentID], MeritRecordDict[si.StudentID], DemeritReduceRecord);
+                        }else
+                        {
+                            si.CalcDemeritMemeritScore(DemeritRecordDict[si.StudentID], new List<JHMeritRecord>(), DemeritReduceRecord);
+                        }
+                        wst.Cells[wstRIdx, 32].PutValue(si.MeritDemeritScore);
+                    }
+                    else
+                    {
+                        // 沒有懲戒
+                        wst.Cells[wstRIdx, 32].PutValue(10);
+                    }
+                   
 
                     // 競賽表現 33
                     d33 = 0;

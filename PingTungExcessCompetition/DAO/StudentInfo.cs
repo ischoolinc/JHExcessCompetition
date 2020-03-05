@@ -93,11 +93,17 @@ namespace PingTungExcessCompetition.DAO
         /// </summary>
         public int Semester5Score = 0;
 
+        /// <summary>
+        /// 品德表現分數
+        /// </summary>
+        public int MeritDemeritScore = 0;
+
+        public bool hasSemester5Score = false;
 
         /// <summary>
-        /// 計算成績
+        /// 計算服務表現成績
         /// </summary>
-        public void CalcScore(List<string> CadreNameFilter)
+        public void CalcCadreScore(List<string> CadreNameFilter)
         {
             HasScore1 = HasScore2 = HasScore3 = false;
             // 109 學年度屏東
@@ -303,24 +309,146 @@ namespace PingTungExcessCompetition.DAO
             //    ServiceScore += 2;
         }
 
+        /// <summary>
+        /// 計算均衡學習
+        /// </summary>
+        /// <param name="SemsScoreList"></param>
         public void CalcSemsScore5(List<JHSemesterScoreRecord> SemsScoreList)
         {
             Semester5Score = 0;
-            
+            hasSemester5Score = true;
+            decimal score1 = 0, score2 = 0, score3 = 0;
+
+            List<string> tmpList = new List<string>();
+            foreach (SemsHistoryInfo sh in SemsHistoryInfoList)
+            {
+                if (sh.GradeYear != "3" && sh.Semester != "2")
+                    tmpList.Add(sh.SchoolYear + "_" + sh.Semester);
+            }
+
+            // 學期歷程未滿5學期
+            if (tmpList.Count != 5)
+                hasSemester5Score = false;
+
+            // 成績未滿5學期
+            foreach (JHSemesterScoreRecord semsRec in SemsScoreList)
+            {
+                string key = semsRec.SchoolYear + "_" + semsRec.Semester;
+                if (!tmpList.Contains(key))
+                    hasSemester5Score = false;
+            }
+
+
             // 1. 本項基本條件為國中健康體育、藝術人文、綜合活動等三個領域五學期平均成績達及格者。
             // 2.符合基本條件單領域五學期平均成績達及格以上者，計 3 分。
             // 3.符合基本條件 2 領域五學期平均成績達及格以上者，計 6 分。
             // 4.符合基本條件 3 領域五學期平均成
             //績達及格以上者，計 9 分。"
 
-            foreach(JHSemesterScoreRecord semsRec in SemsScoreList)
+            foreach (JHSemesterScoreRecord semsRec in SemsScoreList)
             {
+                foreach (string dname in semsRec.Domains.Keys)
+                {
+                    if (dname == "健康體育")
+                    {
+                        if (semsRec.Domains[dname].Score.HasValue)
+                            score1 += semsRec.Domains[dname].Score.Value;
+                    }
 
+                    if (dname == "藝術人文")
+                    {
+                        if (semsRec.Domains[dname].Score.HasValue)
+                            score2 += semsRec.Domains[dname].Score.Value;
+                    }
+
+                    if (dname == "綜合活動")
+                    {
+                        if (semsRec.Domains[dname].Score.HasValue)
+                            score3 += semsRec.Domains[dname].Score.Value;
+                    }
+                }
             }
+
+            if ((score1 / 5) >= 60)
+                Semester5Score += 3;
+
+            if ((score2 / 5) >= 60)
+                Semester5Score += 3;
+
+            if ((score3 / 5) >= 60)
+                Semester5Score += 3;
 
 
         }
 
+        /// <summary>
+        /// 計算品德表現
+        /// </summary>
+        public void CalcDemeritMemeritScore(List<JHDemeritRecord> recD, List<JHMeritRecord> recM, JHMeritDemeritReduceRecord mdr)
+        {
+            int SumRecD = 0, SumRecM = 0;
 
+
+            int da = 3, db = 3, ma = 3, mb = 3;
+
+            // 功過換算
+            if (mdr.DemeritAToDemeritB.HasValue)
+                da = mdr.DemeritAToDemeritB.Value;
+
+            if (mdr.DemeritBToDemeritC.HasValue)
+                db = mdr.DemeritBToDemeritC.Value;
+
+            if (mdr.MeritAToMeritB.HasValue)
+                ma = mdr.MeritAToMeritB.Value;
+
+            if (mdr.MeritBToMeritC.HasValue)
+                mb = mdr.MeritBToMeritC.Value;
+
+            foreach (JHDemeritRecord rec in recD)
+            {
+                int b1 = 0, c1 = 0; ;
+                if (rec.DemeritA.HasValue)
+                    b1 = da * rec.DemeritA.Value;
+                if (rec.DemeritB.HasValue)
+                {
+                    b1 += rec.DemeritB.Value;
+                }
+
+                if (rec.DemeritC.HasValue)
+                    c1 = rec.DemeritC.Value;
+
+                c1 += b1 * db;   // 都換成警告
+                SumRecD += c1;
+            }
+
+            //foreach (JHMeritRecord rec in recM)
+            //{
+            //    int b1 = 0, c1 = 0; ;
+            //    if (rec.MeritA.HasValue)
+            //        b1 = ma * rec.MeritA.Value;
+            //    if (rec.MeritB.HasValue)
+            //    {
+            //        b1 += rec.MeritB.Value;
+            //    }
+
+            //    if (rec.MeritC.HasValue)
+            //        c1 = rec.MeritC.Value;
+
+            //    c1 += b1 * mb;   // 都換成獎勵
+            //    SumRecM += c1;
+            //}
+
+            // 功過相抵 (//使用這提到不功過相抵)  sum = SumRecD - SumRecM;
+            int sum = SumRecD;
+
+            if (sum < 1)
+                MeritDemeritScore = 10;
+            else if (sum < db)
+                MeritDemeritScore = 7;
+            else if (sum < (db * 2))
+                MeritDemeritScore = 4;
+            else
+                MeritDemeritScore = 0;
+        }
     }
 }

@@ -168,19 +168,7 @@ SELECT
 
 
                 // 班級幹部限制
-                List<string> CadreName1 = new List<string>();
-                CadreName1.Add("班長");
-                CadreName1.Add("副班長");
-                CadreName1.Add("學藝股長");
-                CadreName1.Add("風紀股長");
-                CadreName1.Add("衛生股長");
-                CadreName1.Add("服務股長");
-                CadreName1.Add("總務股長");
-                CadreName1.Add("事務股長");
-                CadreName1.Add("康樂股長");
-                CadreName1.Add("體育股長");
-                CadreName1.Add("輔導股長");
-
+                List<string> CadreName1 = Global.GetCadreName1();
 
                 // 學生資料取得與整理需要相關資料
                 if (dtStud != null)
@@ -235,7 +223,7 @@ SELECT
                         }
 
                         // 計算幹部積分
-                        si.CalcScore(CadreName1);
+                        si.CalcCadreScore(CadreName1);
 
 
                         if (!value.ContainsKey(si.ClassID))
