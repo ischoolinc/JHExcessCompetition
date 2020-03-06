@@ -415,7 +415,7 @@ WHERE fieldname = '語言認證' AND value = '是' AND refid IN('" + string.Join
                 DataTable dt = qh.Select(qry);
                 if (dt != null)
                 {
-                    foreach(DataRow dr in dt.Rows)
+                    foreach (DataRow dr in dt.Rows)
                     {
                         string sid = dr["student_id"].ToString();
                         if (!value.Contains(sid))
@@ -426,5 +426,121 @@ WHERE fieldname = '語言認證' AND value = '是' AND refid IN('" + string.Join
 
             return value;
         }
+
+
+        /// <summary>
+        /// 取得學生體適能資料並填入
+        /// </summary>
+        /// <param name="StudentInfoList"></param>
+        /// <param name="endDate"></param>
+        public static List<StudentInfo> FillStudentFitness(List<string> StudentIDList, List<StudentInfo> StudentInfoList, DateTime endDate)
+        {
+            try
+            {
+                // 取得特定日期前體適能資料
+                QueryHelper qh = new QueryHelper();
+                endDate = endDate.AddDays(1);
+                string strEndDate = endDate.Year + "-" + endDate.Month + "-" + endDate.Day;
+                Dictionary<string, List<DataRow>> finDict = new Dictionary<string, List<DataRow>>();
+                string qry = @"
+SELECT 
+ref_student_id
+,test_date
+,sit_and_reach_degree
+,standing_long_jump_degree
+,sit_up_degree
+,cardiorespiratory_degree
+FROM $ischool_student_fitness WHERE test_date <'" + strEndDate + @"' AND ref_student_id IN('" + string.Join("','", StudentIDList.ToArray()) + @"')
+";
+                DataTable dt = qh.Select(qry);
+                if (dt != null)
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        string sid = dr["ref_student_id"].ToString();
+                        if (!finDict.ContainsKey(sid))
+                            finDict.Add(sid, new List<DataRow>());
+
+                        finDict[sid].Add(dr);
+                    }
+                }
+
+                // 填入體適能資料
+                foreach (StudentInfo si in StudentInfoList)
+                {
+                    if (finDict.ContainsKey(si.StudentID))
+                    {
+                        foreach (DataRow dr in finDict[si.StudentID])
+                        {
+                            // sit_and_reach_degree
+                            if (dr["sit_and_reach_degree"] != null)
+                            {
+                                string ss = dr["sit_and_reach_degree"].ToString().Trim();
+                                if (ss == "" || ss == "未檢測")
+                                {
+
+                                }
+                                else
+                                {
+                                    si.sit_and_reach_degreeList.Add(ss);
+                                }
+                            }
+
+                            // standing_long_jump_degree
+                            if (dr["standing_long_jump_degree"] != null)
+                            {
+                                string ss = dr["standing_long_jump_degree"].ToString().Trim();
+                                if (ss == "" || ss == "未檢測")
+                                {
+
+                                }
+                                else
+                                {
+                                    si.standing_long_jump_degreeList.Add(ss);
+                                }
+                            }
+
+                            // sit_up_degree
+                            if (dr["sit_up_degree"] != null)
+                            {
+                                string ss = dr["sit_up_degree"].ToString().Trim();
+                                if (ss == "" || ss == "未檢測")
+                                {
+
+                                }
+                                else
+                                {
+                                    si.sit_up_degreeList.Add(ss);
+                                }
+                            }
+
+                            // cardiorespiratory_degree
+                            if (dr["cardiorespiratory_degree"] != null)
+                            {
+                                string ss = dr["cardiorespiratory_degree"].ToString().Trim();
+                                if (ss == "" || ss == "未檢測")
+                                {
+
+                                }
+                                else
+                                {
+                                    si.cardiorespiratory_degreeList.Add(ss);
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return StudentInfoList;
+        }
+
+
     }
 }

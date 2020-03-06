@@ -84,6 +84,11 @@ namespace PingTungExcessCompetition.DAO
         public List<string> ServiceMemo = new List<string>();
 
         /// <summary>
+        /// 是否身心手冊
+        /// </summary>
+        public bool isSpecial = false;
+
+        /// <summary>
         /// 服務積分
         /// </summary>
         public int ServiceScore = 0;
@@ -97,6 +102,12 @@ namespace PingTungExcessCompetition.DAO
         /// 品德表現分數
         /// </summary>
         public int MeritDemeritScore = 0;
+
+        /// <summary>
+        /// 體適能分數
+        /// </summary>
+        public int FitnessScore = 0;
+
 
         public bool hasSemester5Score = false;
 
@@ -450,5 +461,106 @@ namespace PingTungExcessCompetition.DAO
             else
                 MeritDemeritScore = 0;
         }
+
+        /// <summary>
+        /// 體適能用
+        /// </summary>
+        public List<string> sit_and_reach_degreeList = new List<string>();
+        public List<string> standing_long_jump_degreeList = new List<string>();
+        public List<string> sit_up_degreeList = new List<string>();
+        public List<string> cardiorespiratory_degreeList = new List<string>();
+
+        /// <summary>
+        /// 計算體適能分數
+        /// </summary>
+        public void CalcFitnessScore()
+        {
+            int ItemCount = 0, passCount = 0;
+
+
+            // 符合達標字串
+            List<string> passStringList = new List<string>();
+            passStringList.Add("金牌");
+            passStringList.Add("銀牌");
+            passStringList.Add("銅牌");
+            passStringList.Add("中等");
+            passStringList.Add("免測");
+
+
+            if (isSpecial)
+            {// 有身心手冊 8分
+                FitnessScore = 8;
+            }
+            else
+            {
+                FitnessScore = 0;
+
+                if (sit_and_reach_degreeList.Count > 0)
+                    ItemCount += 1;
+                if (standing_long_jump_degreeList.Count > 0)
+                    ItemCount += 1;
+                if (sit_up_degreeList.Count > 0)
+                    ItemCount += 1;
+                if (cardiorespiratory_degreeList.Count > 0)
+                    ItemCount += 1;
+
+                // 檢查四項資料
+                foreach (string name in passStringList)
+                {
+                    if (sit_and_reach_degreeList.Contains(name))
+                    {
+                        passCount += 1;
+                        break;
+                    }
+                }
+
+                foreach (string name in passStringList)
+                {
+                    if (standing_long_jump_degreeList.Contains(name))
+                    {
+                        passCount += 1;
+                        break;
+                    }
+                }
+
+                foreach (string name in passStringList)
+                {
+                    if (sit_up_degreeList.Contains(name))
+                    {
+                        passCount += 1;
+                        break;
+                    }
+                }
+
+                foreach (string name in passStringList)
+                {
+                    if (cardiorespiratory_degreeList.Contains(name))
+                    {
+                        passCount += 1;
+                        break;
+                    }
+                }
+
+                if (ItemCount == 4)
+                {
+                    // 有四項但都未達標 2 分
+                    FitnessScore = 2;
+
+                    if (passCount == 1)
+                        FitnessScore = 4;
+
+                    if (passCount == 2)
+                        FitnessScore = 6;
+
+                    if (passCount == 3)
+                        FitnessScore = 8;
+
+                    if (passCount == 4)
+                        FitnessScore = 10;
+
+                }
+            }
+        }
+
     }
 }

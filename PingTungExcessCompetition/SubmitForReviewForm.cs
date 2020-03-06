@@ -279,6 +279,10 @@ namespace PingTungExcessCompetition
                         }
                     }
                 }
+
+                // 取得學生體適能資料並填入
+                QueryData.FillStudentFitness(StudentIDList, StudentInfoList, _Configure.EndDate);
+                
                 // 填入 Excel 資料
                 int wstRIdx = 1;
 
@@ -357,6 +361,7 @@ namespace PingTungExcessCompetition
 
                             if (MappingTag2.ContainsKey(tagName))
                             {
+                                si.isSpecial = true;
                                 // 身心障礙 16                               
                                 wst.Cells[wstRIdx, 16].PutValue(MappingTag2[tagName]);
                             }
@@ -470,8 +475,9 @@ namespace PingTungExcessCompetition
                     wst.Cells[wstRIdx, 33].PutValue(d33);
 
                     // 體適能 34
-                    d34 = 0;
-                    wst.Cells[wstRIdx, 34].PutValue(d34);
+                    // 計算並填入
+                    si.CalcFitnessScore();
+                    wst.Cells[wstRIdx, 34].PutValue(si.FitnessScore);
 
                     // 本土語言認證 35
                     if (hasLanguageCertificateIDList.Contains(si.StudentID))
