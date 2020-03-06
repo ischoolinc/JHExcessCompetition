@@ -542,5 +542,131 @@ FROM $ischool_student_fitness WHERE test_date <'" + strEndDate + @"' AND ref_stu
         }
 
 
+        /// <summary>
+        /// 取得競賽資料並填入
+        /// </summary>
+        /// <param name="StudentIDList"></param>
+        /// <param name="StudentInfoList"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        public static List<StudentInfo> FillStudentCompetitionScore(List<string> StudentIDList, List<StudentInfo> StudentInfoList, DateTime endDate)
+        {
+            try
+            {
+                // 取得特定日期前競賽資料
+                QueryHelper qh = new QueryHelper();
+                endDate = endDate.AddDays(1);
+                string strEndDate = endDate.Year + "-" + endDate.Month + "-" + endDate.Day;
+                Dictionary<string, List<DataRow>> compDict = new Dictionary<string, List<DataRow>>();
+                string qry = @"
+SELECT 
+    ref_student_id
+    ,school_year
+    ,habitude
+    ,organizer
+    ,setting_name
+    ,max(bt_integral)  bt_integral
+FROM $competition.performance.student INNER JOIN $competition.performance.rank
+ON $competition.performance.student.rank_name = $competition.performance.rank.bt_rank
+WHERE ref_student_id IN ('" + string.Join("','", StudentIDList.ToArray()) + "') AND certificate_date < '" + strEndDate + @"'
+GROUP BY ref_student_id
+,school_year
+,habitude
+,organizer
+,setting_name
+
+";
+                DataTable dt = qh.Select(qry);
+                if (dt != null)
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        string sid = dr["ref_student_id"].ToString();
+                        if (!compDict.ContainsKey(sid))
+                            compDict.Add(sid, new List<DataRow>());
+
+                        compDict[sid].Add(dr);
+                    }
+                }
+
+                // 填入資料
+                foreach (StudentInfo si in StudentInfoList)
+                {
+                    if (compDict.ContainsKey(si.StudentID))
+                    {
+                        foreach (DataRow dr in compDict[si.StudentID])
+                        {
+                            int sc = 0;
+                            if (int.TryParse(dr["bt_integral"].ToString(), out sc))
+                            {
+                                si.CompetitionScoreD.Add(sc);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return StudentInfoList;
+        }
+
+        /// <summary>
+        /// 取得中低收入戶並填入
+        /// </summary>
+        /// <param name="StudentIDList"></param>
+        /// <param name="StudentInfoList"></param>
+        /// <returns></returns>
+
+        public static List<StudentInfo> FillIncomeType(List<string> StudentIDList, List<StudentInfo> StudentInfoList)
+        {
+            try
+            {
+                // 取得中低收入資料
+                QueryHelper qh = new QueryHelper();
+
+                Dictionary<string, DataRow> compDict = new Dictionary<string, DataRow>();
+                string qry = @"
+SELECT ref_student_id AS student_id
+,income_type 
+FROM student_info_ext WHERE ref_student_id IN(" + string.Join(",", StudentIDList.ToArray()) + @")
+
+";
+                DataTable dt = qh.Select(qry);
+                if (dt != null)
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        string sid = dr["student_id"].ToString();
+                        if (!compDict.ContainsKey(sid))
+                            compDict.Add(sid, dr);
+                    }
+                }
+
+                // 填入資料
+                foreach (StudentInfo si in StudentInfoList)
+                {
+                    if (compDict.ContainsKey(si.StudentID))
+                    {
+                        if (compDict[si.StudentID]["income_type"] != null)
+                        {
+                            if (compDict[si.StudentID]["income_type"].ToString() == "低")
+                                si.incomeType1 = true;
+
+                            if (compDict[si.StudentID]["income_type"].ToString() == "中低")
+                                si.incomeType2 = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return StudentInfoList;
+        }
     }
 }

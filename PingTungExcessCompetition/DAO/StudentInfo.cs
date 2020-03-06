@@ -108,8 +108,23 @@ namespace PingTungExcessCompetition.DAO
         /// </summary>
         public int FitnessScore = 0;
 
+        /// <summary>
+        /// 是否低輸入
+        /// </summary>
+        public bool incomeType1 = false;
+
+        /// <summary>
+        /// 是否中低收入
+        /// </summary>
+        public bool incomeType2 = false;
+
 
         public bool hasSemester5Score = false;
+
+
+        public int CompetitionScore = 0;
+
+        public List<int> CompetitionScoreD = new List<int>();
 
         /// <summary>
         /// 計算服務表現成績
@@ -562,5 +577,16 @@ namespace PingTungExcessCompetition.DAO
             }
         }
 
+
+        /// <summary>
+        /// 計算競賽積分
+        /// </summary>
+        public void CalcCompetitionScore()
+        {
+            CompetitionScore = CompetitionScoreD.Sum();
+            // 最高10分
+            if (CompetitionScore > 10)
+                CompetitionScore = 10;
+        }
     }
 }

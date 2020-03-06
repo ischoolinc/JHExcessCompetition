@@ -280,16 +280,19 @@ namespace PingTungExcessCompetition
                     }
                 }
 
+                // 填入中低收入戶
+                StudentInfoList = QueryData.FillIncomeType(StudentIDList, StudentInfoList);
+
+                // 填入競賽成績
+                StudentInfoList = QueryData.FillStudentCompetitionScore(StudentIDList, StudentInfoList, _Configure.EndDate);
+
                 // 取得學生體適能資料並填入
-                QueryData.FillStudentFitness(StudentIDList, StudentInfoList, _Configure.EndDate);
-                
+                StudentInfoList = QueryData.FillStudentFitness(StudentIDList, StudentInfoList, _Configure.EndDate);
+
                 // 填入 Excel 資料
                 int wstRIdx = 1;
 
-                int d18 = 0, d19 = 0, d31 = 0, d32 = 0, d33 = 0, d34 = 0;
-
-
-
+          
                 bgWorkerExport.ReportProgress(70);
 
                 // 幹部限制
@@ -337,12 +340,16 @@ namespace PingTungExcessCompetition
                     // 就學區 17
 
                     // 低收入戶 18
-                    d18 = 0;
-                    wst.Cells[wstRIdx, 18].PutValue(d18);
+                    if (si.incomeType1)
+                        wst.Cells[wstRIdx, 18].PutValue(1);
+                    else
+                        wst.Cells[wstRIdx, 18].PutValue(0);
 
                     // 中低收入戶 19
-                    d19 = 0;
-                    wst.Cells[wstRIdx, 19].PutValue(d19);
+                    if (si.incomeType2)
+                        wst.Cells[wstRIdx, 19].PutValue(1);
+                    else
+                        wst.Cells[wstRIdx, 19].PutValue(0);
 
                     wst.Cells[wstRIdx, 15].PutValue("0");
                     wst.Cells[wstRIdx, 16].PutValue("0");
@@ -457,7 +464,8 @@ namespace PingTungExcessCompetition
                         if (MeritRecordDict.ContainsKey(si.StudentID))
                         {
                             si.CalcDemeritMemeritScore(DemeritRecordDict[si.StudentID], MeritRecordDict[si.StudentID], DemeritReduceRecord);
-                        }else
+                        }
+                        else
                         {
                             si.CalcDemeritMemeritScore(DemeritRecordDict[si.StudentID], new List<JHMeritRecord>(), DemeritReduceRecord);
                         }
@@ -468,11 +476,11 @@ namespace PingTungExcessCompetition
                         // 沒有懲戒
                         wst.Cells[wstRIdx, 32].PutValue(10);
                     }
-                   
+
 
                     // 競賽表現 33
-                    d33 = 0;
-                    wst.Cells[wstRIdx, 33].PutValue(d33);
+                    si.CalcCompetitionScore();
+                    wst.Cells[wstRIdx, 33].PutValue(si.CompetitionScore);
 
                     // 體適能 34
                     // 計算並填入
