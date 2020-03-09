@@ -266,19 +266,20 @@ namespace PingTungExcessCompetition
                 List<JHMeritRecord> tmpMeritRecord = JHMerit.SelectByStudentIDs(StudentIDList);
                 foreach (JHMeritRecord rec in tmpMeritRecord)
                 {
-                    if (rec.RegisterDate.HasValue)
+                    if (rec.OccurDate > _Configure.EndDate)
+                        continue;
+                    else
                     {
-                        if (rec.RegisterDate.Value > _Configure.EndDate)
-                            continue;
-                        else
-                        {
-                            if (!MeritRecordDict.ContainsKey(rec.RefStudentID))
-                                MeritRecordDict.Add(rec.RefStudentID, new List<JHMeritRecord>());
+                        if (!MeritRecordDict.ContainsKey(rec.RefStudentID))
+                            MeritRecordDict.Add(rec.RefStudentID, new List<JHMeritRecord>());
 
-                            MeritRecordDict[rec.RefStudentID].Add(rec);
-                        }
+                        MeritRecordDict[rec.RefStudentID].Add(rec);
                     }
+
                 }
+
+                // 填入幹部資料
+                StudentInfoList = QueryData.FillCad(StudentIDList, StudentInfoList);
 
                 // 填入中低收入戶
                 StudentInfoList = QueryData.FillIncomeType(StudentIDList, StudentInfoList);
@@ -292,7 +293,7 @@ namespace PingTungExcessCompetition
                 // 填入 Excel 資料
                 int wstRIdx = 1;
 
-          
+
                 bgWorkerExport.ReportProgress(70);
 
                 // 幹部限制
@@ -424,22 +425,35 @@ namespace PingTungExcessCompetition
                     // 行動電話 24
                     if (PhoneDict.ContainsKey(si.StudentID))
                     {
-                        wst.Cells[wstRIdx, 23].PutValue(PhoneDict[si.StudentID].Contact);
-                        wst.Cells[wstRIdx, 24].PutValue(PhoneDict[si.StudentID].Cell);
+                        wst.Cells[wstRIdx, 23].PutValue(PhoneDict[si.StudentID].Contact.Replace("-", "").Replace(")", "").Replace("(", ""));
+                        wst.Cells[wstRIdx, 24].PutValue(PhoneDict[si.StudentID].Cell.Replace("-", "").Replace(")", "").Replace("(", ""));
                     }
 
 
                     // 郵遞區號 25
                     if (AddressDict.ContainsKey(si.StudentID))
                     {
-                        wst.Cells[wstRIdx, 25].PutValue(AddressDict[si.StudentID].MailingZipCode);
+
+                        string zipCode = AddressDict[si.StudentID].MailingZipCode;
+
+                        if (zipCode.Length >= 3)
+                            zipCode = zipCode.Substring(0, 3);
+
+                        wst.Cells[wstRIdx, 25].PutValue(zipCode);
 
                         // 通訊地址 26
                         wst.Cells[wstRIdx, 26].PutValue(AddressDict[si.StudentID].MailingCounty + AddressDict[si.StudentID].MailingTown + AddressDict[si.StudentID].MailingDistrict + AddressDict[si.StudentID].MailingArea + AddressDict[si.StudentID].MailingDetail);
 
                     }
                     // 非中華民國身分證號 27
-
+                    if (si.isTaiwanID)
+                    {
+                        wst.Cells[wstRIdx, 27].PutValue("");
+                    }
+                    else
+                    {
+                        wst.Cells[wstRIdx, 27].PutValue("V");
+                    }
 
 
                     // 市內電話分機 29
@@ -490,7 +504,7 @@ namespace PingTungExcessCompetition
                     // 本土語言認證 35
                     if (hasLanguageCertificateIDList.Contains(si.StudentID))
                     {
-                        wst.Cells[wstRIdx, 35].PutValue(1);
+                        wst.Cells[wstRIdx, 35].PutValue(2);
                     }
                     else
                     {
@@ -546,11 +560,14 @@ namespace PingTungExcessCompetition
 
             LoadTemplate();
             dtDate.Value = _Configure.EndDate;
-            LoadStudentTag();
-            LoadConfig();
 
+            LoadConfig();
+            LoadStudentTag();
+            LoadDataGridViewValue();
             UserControlEnable(true);
         }
+
+
 
         private void btnSave_Click(object sender, EventArgs e)
         {
@@ -586,8 +603,8 @@ namespace PingTungExcessCompetition
                                     int rowIdx = dgData1.Rows.Add();
                                     dgData1.Rows[rowIdx].Cells[colCode1.Index].Value = elm1.Attribute("Code").Value;
                                     dgData1.Rows[rowIdx].Cells[colItem1.Index].Value = elm1.Attribute("Name").Value;
-                                    dgData1.Rows[rowIdx].Cells[2].Value = elm1.Attribute("TagName").Value;
                                 }
+
                             }
 
                             if (gpName == "身心障礙")
@@ -597,7 +614,6 @@ namespace PingTungExcessCompetition
                                     int rowIdx = dgData2.Rows.Add();
                                     dgData2.Rows[rowIdx].Cells[colCode1.Index].Value = elm1.Attribute("Code").Value;
                                     dgData2.Rows[rowIdx].Cells[colItem1.Index].Value = elm1.Attribute("Name").Value;
-                                    dgData2.Rows[rowIdx].Cells[2].Value = elm1.Attribute("TagName").Value;
                                 }
                             }
 
@@ -608,17 +624,12 @@ namespace PingTungExcessCompetition
                                     int rowIdx = dgData3.Rows.Add();
                                     dgData3.Rows[rowIdx].Cells[colCode1.Index].Value = elm1.Attribute("Code").Value;
                                     dgData3.Rows[rowIdx].Cells[colItem1.Index].Value = elm1.Attribute("Name").Value;
-                                    dgData3.Rows[rowIdx].Cells[2].Value = elm1.Attribute("TagName").Value;
                                 }
                             }
 
-                            if (gpName == "失業勞工子女")
-                            {
-                                foreach (XElement elm1 in elm.Elements("Item"))
-                                {
-                                    cboSelectTag4.Text = elm1.Attribute("TagName").Value;
-                                }
-                            }
+
+                            cboSelectTag4.Text = "";
+
                         }
                     }
                 }
@@ -638,6 +649,11 @@ namespace PingTungExcessCompetition
         {
             StudentCanSelectTagDict = QueryData.GetStudentAllTag();
 
+            DataTable dd1 = new DataTable();
+            DataTable dd2 = new DataTable();
+            DataTable dd3 = new DataTable();
+            DataTable dd4 = new DataTable();
+
             cboSelectTag4.Items.Clear();
             DataGridViewComboBoxColumn cboItem1 = new DataGridViewComboBoxColumn();
             cboItem1.Name = "colStudTag1";
@@ -645,28 +661,158 @@ namespace PingTungExcessCompetition
             cboItem1.HeaderText = "學生類別";
 
             DataGridViewComboBoxColumn cboItem2 = new DataGridViewComboBoxColumn();
-            cboItem2.Name = "colStudTag1";
+            cboItem2.Name = "colStudTag2";
             cboItem2.Width = 150;
             cboItem2.HeaderText = "學生類別";
 
             DataGridViewComboBoxColumn cboItem3 = new DataGridViewComboBoxColumn();
-            cboItem3.Name = "colStudTag1";
+            cboItem3.Name = "colStudTag3";
             cboItem3.Width = 150;
             cboItem3.HeaderText = "學生類別";
 
+
+            cboSelectTag4.Items.Add("");
+            dd1.Columns.Add("VALUE");
+            dd1.Columns.Add("ITEM");
+            dd2.Columns.Add("VALUE");
+            dd2.Columns.Add("ITEM");
+            dd3.Columns.Add("VALUE");
+            dd3.Columns.Add("ITEM");
+            dd4.Columns.Add("VALUE");
+            dd4.Columns.Add("ITEM");
+
+            List<string> selectItems = new List<string>();
+            selectItems.Add("");
+
             foreach (string name in StudentCanSelectTagDict.Values)
             {
-                cboItem1.Items.Add(name);
-                cboItem2.Items.Add(name);
-                cboItem3.Items.Add(name);
-
-                cboSelectTag4.Items.Add(name);
+                selectItems.Add(name);
             }
+
+
+            foreach (string name in selectItems)
+            {
+                DataRow dr1 = dd1.NewRow();
+                dr1["VALUE"] = name;
+                dr1["ITEM"] = name;
+                dd1.Rows.Add(dr1);
+
+                DataRow dr2 = dd2.NewRow();
+                dr2["VALUE"] = name;
+                dr2["ITEM"] = name;
+                dd2.Rows.Add(dr2);
+
+                DataRow dr3 = dd3.NewRow();
+                dr3["VALUE"] = name;
+                dr3["ITEM"] = name;
+                dd3.Rows.Add(dr3);
+
+                DataRow dr4 = dd4.NewRow();
+                dr4["VALUE"] = name;
+                dr4["ITEM"] = name;
+                dd4.Rows.Add(dr4);
+            }
+
+            cboItem1.DataSource = dd1;
+            cboItem1.DisplayMember = "ITEM";
+            cboItem1.ValueMember = "VALUE";
+
+            cboItem2.DataSource = dd2;
+            cboItem2.DisplayMember = "ITEM";
+            cboItem2.ValueMember = "VALUE";
+
+            cboItem3.DataSource = dd3;
+            cboItem3.DisplayMember = "ITEM";
+            cboItem3.ValueMember = "VALUE";
+
+            cboSelectTag4.DataSource = dd4;
+
+            cboSelectTag4.DisplayMember = "ITEM";
+            cboSelectTag4.ValueMember = "VALUE";
 
             dgData1.Columns.Add(cboItem1);
             dgData2.Columns.Add(cboItem2);
             dgData3.Columns.Add(cboItem3);
         }
+
+        private void LoadDataGridViewValue()
+        {
+            if (_Configure != null)
+            {
+                try
+                {
+                    XElement elmRoot = XElement.Parse(_Configure.MappingContent);
+                    if (elmRoot != null)
+                    {
+                        foreach (XElement elm in elmRoot.Elements("Group"))
+                        {
+                            string gpName = elm.Attribute("Name").Value;
+                            if (gpName == "學生身分")
+                            {
+                                foreach (DataGridViewRow drv in dgData1.Rows)
+                                {
+                                    foreach (XElement elm1 in elm.Elements("Item"))
+                                    {
+                                        if (drv.Cells[colItem1.Index].Value.ToString() == elm1.Attribute("Name").Value)
+                                        {
+                                            drv.Cells[2].Value = elm1.Attribute("TagName").Value;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            if (gpName == "身心障礙")
+                            {
+                                foreach (DataGridViewRow drv in dgData2.Rows)
+                                {
+                                    foreach (XElement elm1 in elm.Elements("Item"))
+                                    {
+                                        if (drv.Cells[colItem1.Index].Value.ToString() == elm1.Attribute("Name").Value)
+                                        {
+                                            drv.Cells[2].Value = elm1.Attribute("TagName").Value;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            if (gpName == "學生報名身分設定")
+                            {
+                                foreach (DataGridViewRow drv in dgData3.Rows)
+                                {
+                                    foreach (XElement elm1 in elm.Elements("Item"))
+                                    {
+                                        if (drv.Cells[colItem1.Index].Value.ToString() == elm1.Attribute("Name").Value)
+                                        {
+                                            drv.Cells[2].Value = elm1.Attribute("TagName").Value;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (gpName == "失業勞工子女")
+                            {
+                                foreach (XElement elm1 in elm.Elements("Item"))
+                                {
+                                    cboSelectTag4.Text = elm1.Attribute("TagName").Value;
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MsgBox.Show("解析設定檔失敗," + ex.Message);
+                }
+            }
+        }
+
 
         /// <summary>
         /// 儲存設定檔
@@ -689,12 +835,21 @@ namespace PingTungExcessCompetition
                             {
                                 if (drv.IsNewRow)
                                     continue;
+
                                 foreach (XElement elm1 in elm.Elements("Item"))
                                 {
                                     string name = elm1.Attribute("Name").Value;
                                     if (name == drv.Cells[colItem1.Index].Value.ToString())
                                     {
-                                        elm1.SetAttributeValue("TagName", drv.Cells[2].Value.ToString());
+                                        if (drv.Cells[2].Value == null)
+                                        {
+                                            elm1.SetAttributeValue("TagName", "");
+                                        }
+                                        else
+                                        {
+                                            elm1.SetAttributeValue("TagName", drv.Cells[2].Value.ToString());
+                                        }
+                                        break;
                                     }
                                 }
                             }
@@ -711,7 +866,15 @@ namespace PingTungExcessCompetition
                                     string name = elm1.Attribute("Name").Value;
                                     if (name == drv.Cells[colItem1.Index].Value.ToString())
                                     {
-                                        elm1.SetAttributeValue("TagName", drv.Cells[2].Value.ToString());
+                                        if (drv.Cells[2].Value == null)
+                                        {
+                                            elm1.SetAttributeValue("TagName", "");
+                                        }
+                                        else
+                                        {
+                                            elm1.SetAttributeValue("TagName", drv.Cells[2].Value.ToString());
+                                        }
+                                        break;
                                     }
                                 }
                             }
@@ -728,7 +891,15 @@ namespace PingTungExcessCompetition
                                     string name = elm1.Attribute("Name").Value;
                                     if (name == drv.Cells[colItem1.Index].Value.ToString())
                                     {
-                                        elm1.SetAttributeValue("TagName", drv.Cells[2].Value.ToString());
+                                        if (drv.Cells[2].Value == null)
+                                        {
+                                            elm1.SetAttributeValue("TagName", "");
+                                        }
+                                        else
+                                        {
+                                            elm1.SetAttributeValue("TagName", drv.Cells[2].Value.ToString());
+                                        }
+                                        break;
                                     }
                                 }
                             }
@@ -738,8 +909,15 @@ namespace PingTungExcessCompetition
                         {
                             foreach (XElement elm1 in elm.Elements("Item"))
                             {
-                                elm1.SetAttributeValue("TagName", cboSelectTag4.Text);
-
+                                if (cboSelectTag4.Text == null)
+                                {
+                                    elm1.SetAttributeValue("TagName", "");
+                                }
+                                else
+                                {
+                                    elm1.SetAttributeValue("TagName", cboSelectTag4.Text);
+                                }
+                                break;
                             }
                         }
                     }

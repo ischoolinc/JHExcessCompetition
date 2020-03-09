@@ -24,6 +24,11 @@ namespace PingTungExcessCompetition.DAO
         public string IDNumber { get; set; }
 
         /// <summary>
+        /// 台灣身分證
+        /// </summary>
+        public bool isTaiwanID { get; set; }
+
+        /// <summary>
         /// 出生年
         /// </summary>
         public string BirthYear { get; set; }
@@ -46,6 +51,10 @@ namespace PingTungExcessCompetition.DAO
         public bool HasScore2 = false;
         public bool HasScore3 = false;
 
+        /// <summary>
+        /// 學校代碼
+        /// </summary>
+        public string SchoolCode = "";
 
         /// <summary>
         /// 學習歷程
@@ -348,22 +357,29 @@ namespace PingTungExcessCompetition.DAO
             List<string> tmpList = new List<string>();
             foreach (SemsHistoryInfo sh in SemsHistoryInfoList)
             {
-                if (sh.GradeYear != "3" && sh.Semester != "2")
-                    tmpList.Add(sh.SchoolYear + "_" + sh.Semester);
+                if (sh.GradeYear == "3" && sh.Semester == "2")
+                    continue;
+
+                tmpList.Add(sh.SchoolYear + "_" + sh.Semester);
             }
 
             // 學期歷程未滿5學期
-            if (tmpList.Count != 5)
+            if (tmpList.Count < 5)
                 hasSemester5Score = false;
 
+            int sescoreCount = 0;
             // 成績未滿5學期
             foreach (JHSemesterScoreRecord semsRec in SemsScoreList)
             {
                 string key = semsRec.SchoolYear + "_" + semsRec.Semester;
-                if (!tmpList.Contains(key))
-                    hasSemester5Score = false;
+                if (tmpList.Contains(key))
+                {
+                    sescoreCount += 1;
+                }
             }
 
+            if (tmpList.Count != sescoreCount)
+                hasSemester5Score = false;
 
             // 1. 本項基本條件為國中健康體育、藝術人文、綜合活動等三個領域五學期平均成績達及格者。
             // 2.符合基本條件單領域五學期平均成績達及格以上者，計 3 分。
@@ -373,24 +389,28 @@ namespace PingTungExcessCompetition.DAO
 
             foreach (JHSemesterScoreRecord semsRec in SemsScoreList)
             {
-                foreach (string dname in semsRec.Domains.Keys)
+                string key = semsRec.SchoolYear + "_" + semsRec.Semester;
+                if (tmpList.Contains(key))
                 {
-                    if (dname == "健康體育")
+                    foreach (string dname in semsRec.Domains.Keys)
                     {
-                        if (semsRec.Domains[dname].Score.HasValue)
-                            score1 += semsRec.Domains[dname].Score.Value;
-                    }
+                        if (dname == "健康體育" || dname == "健康與體育")
+                        {
+                            if (semsRec.Domains[dname].Score.HasValue)
+                                score1 += semsRec.Domains[dname].Score.Value;
+                        }
 
-                    if (dname == "藝術人文")
-                    {
-                        if (semsRec.Domains[dname].Score.HasValue)
-                            score2 += semsRec.Domains[dname].Score.Value;
-                    }
+                        if (dname == "藝術人文" || dname == "藝術與人文")
+                        {
+                            if (semsRec.Domains[dname].Score.HasValue)
+                                score2 += semsRec.Domains[dname].Score.Value;
+                        }
 
-                    if (dname == "綜合活動")
-                    {
-                        if (semsRec.Domains[dname].Score.HasValue)
-                            score3 += semsRec.Domains[dname].Score.Value;
+                        if (dname == "綜合活動")
+                        {
+                            if (semsRec.Domains[dname].Score.HasValue)
+                                score3 += semsRec.Domains[dname].Score.Value;
+                        }
                     }
                 }
             }

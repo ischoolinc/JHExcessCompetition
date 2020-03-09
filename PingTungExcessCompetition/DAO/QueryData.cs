@@ -350,10 +350,52 @@ ORDER BY class.grade_year,class.display_order,class.class_name,seat_no
                     si.StudentID = dr["student_id"].ToString();
                     si.ClassID = dr["class_id"].ToString();
                     si.StudentNumber = dr["student_number"].ToString();
-                    si.ClassName = dr["class_name"].ToString();
-                    si.SeatNo = dr["seat_no"].ToString();
+
+                    if (K12.Data.School.Code.Length >= 6)
+                    {
+                        si.SchoolCode = K12.Data.School.Code.Substring(0, 6);
+                    }
+                    else
+                        si.SchoolCode = K12.Data.School.Code;
+
+                    string className = dr["class_name"].ToString();
+
+                    // 班名取2位
+                    if (className.Length >= 2)
+                        si.ClassName = className.Substring(className.Length - 2, 2);
+                    else
+                        si.ClassName = className;
+
+                    // 座號補0
+                    int no;
+                    if (int.TryParse(dr["seat_no"].ToString(), out no))
+                    {
+                        if (no < 10)
+                            si.SeatNo = "0" + no;
+                        else
+                            si.SeatNo = no + "";
+                    }
+                    else
+                    {
+                        si.SeatNo = "";
+                    }
+
                     si.StudentName = dr["student_name"].ToString();
-                    si.IDNumber = dr["id_number"].ToString();
+
+
+                    si.IDNumber = dr["id_number"].ToString().Trim();
+
+                    // 檢查是否台灣身分證
+                    string ii = si.IDNumber.Substring(1, 1);
+                    if (ii == "1" || ii == "2")
+                    {
+                        si.isTaiwanID = true;
+                    }
+                    else
+                    {
+                        si.isTaiwanID = false;
+                    }
+
                     si.GenderCode = dr["gender"].ToString();
                     DateTime dt1;
                     if (DateTime.TryParse(dr["birthdate"].ToString(), out dt1))
@@ -535,7 +577,7 @@ FROM $ischool_student_fitness WHERE test_date <'" + strEndDate + @"' AND ref_stu
             }
             catch (Exception ex)
             {
-                throw ex;
+                //  throw ex;
             }
 
             return StudentInfoList;
@@ -607,7 +649,7 @@ GROUP BY ref_student_id
             }
             catch (Exception ex)
             {
-                throw ex;
+                // throw ex;
             }
 
             return StudentInfoList;
@@ -663,10 +705,76 @@ FROM student_info_ext WHERE ref_student_id IN(" + string.Join(",", StudentIDList
             }
             catch (Exception ex)
             {
-                throw ex;
+                // throw ex;
             }
 
             return StudentInfoList;
         }
+
+        /// <summary>
+        /// 取得幹部資料
+        /// </summary>
+        /// <param name="StudentIDList"></param>
+        /// <param name="StudentInfoList"></param>
+        /// <returns></returns>
+        public static List<StudentInfo> FillCad(List<string> StudentIDList, List<StudentInfo> StudentInfoList)
+        {
+            try
+            {
+                // 取得中低收入資料
+                QueryHelper qh = new QueryHelper();
+
+                Dictionary<string, List<CadreInfo>> studCadDict = new Dictionary<string, List<CadreInfo>>();
+                string qry = @"
+SELECT 
+        student.id AS student_id
+        ,schoolyear AS school_year
+        ,semester
+        ,referencetype
+        ,cadrename
+ FROM 
+    student INNER JOIN $behavior.thecadre
+         ON student.id = CAST($behavior.thecadre.studentid AS INTEGER) 
+  WHERE student.status=1 AND student.id IN(" + string.Join(",", StudentIDList.ToArray()) + @") 
+     ORDER BY student.id,$behavior.thecadre.schoolyear,semester
+";
+                DataTable dt = qh.Select(qry);
+                if (dt != null)
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        string sid = dr["student_id"].ToString();
+                        if (!studCadDict.ContainsKey(sid))
+                        {
+                            studCadDict.Add(sid, new List<CadreInfo>());
+                        }
+
+                        CadreInfo ci = new CadreInfo();
+                        ci.SchoolYear = dr["school_year"].ToString();
+                        ci.Semester = dr["semester"].ToString();
+                        ci.StudentID = dr["student_id"].ToString();
+                        ci.CadreName = dr["cadrename"].ToString();
+                        ci.ReferenceType = dr["referencetype"].ToString();
+                        studCadDict[sid].Add(ci);
+                    }
+                }
+
+                // 填入資料
+                foreach (StudentInfo si in StudentInfoList)
+                {
+                    if (studCadDict.ContainsKey(si.StudentID))
+                    {
+                        si.CadreInfoList = studCadDict[si.StudentID];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // throw ex;
+            }
+
+            return StudentInfoList;
+        }
+
     }
 }
