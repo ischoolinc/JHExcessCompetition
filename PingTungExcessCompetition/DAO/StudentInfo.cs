@@ -386,6 +386,7 @@ namespace PingTungExcessCompetition.DAO
             // 3.符合基本條件 2 領域五學期平均成績達及格以上者，計 6 分。
             // 4.符合基本條件 3 領域五學期平均成
             //績達及格以上者，計 9 分。"
+            // 佳樺提供需求需要使用原始成績
 
             foreach (JHSemesterScoreRecord semsRec in SemsScoreList)
             {
@@ -396,20 +397,20 @@ namespace PingTungExcessCompetition.DAO
                     {
                         if (dname == "健康體育" || dname == "健康與體育")
                         {
-                            if (semsRec.Domains[dname].Score.HasValue)
-                                score1 += semsRec.Domains[dname].Score.Value;
+                            if (semsRec.Domains[dname].ScoreOrigin.HasValue)
+                                score1 += semsRec.Domains[dname].ScoreOrigin.Value;
                         }
 
                         if (dname == "藝術人文" || dname == "藝術與人文")
                         {
-                            if (semsRec.Domains[dname].Score.HasValue)
-                                score2 += semsRec.Domains[dname].Score.Value;
+                            if (semsRec.Domains[dname].ScoreOrigin.HasValue)
+                                score2 += semsRec.Domains[dname].ScoreOrigin.Value;
                         }
 
                         if (dname == "綜合活動")
                         {
-                            if (semsRec.Domains[dname].Score.HasValue)
-                                score3 += semsRec.Domains[dname].Score.Value;
+                            if (semsRec.Domains[dname].ScoreOrigin.HasValue)
+                                score3 += semsRec.Domains[dname].ScoreOrigin.Value;
                         }
                     }
                 }
