@@ -606,7 +606,7 @@ SELECT
     ,school_year
     ,habitude
     ,organizer
-    ,setting_name
+    ,remark
     ,max(bt_integral)  bt_integral
 FROM $competition.performance.student INNER JOIN $competition.performance.rank
 ON $competition.performance.student.rank_name = $competition.performance.rank.bt_rank
@@ -615,7 +615,7 @@ GROUP BY ref_student_id
 ,school_year
 ,habitude
 ,organizer
-,setting_name
+,remark
 
 ";
                 DataTable dt = qh.Select(qry);
