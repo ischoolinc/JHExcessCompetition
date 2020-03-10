@@ -246,7 +246,7 @@ SELECT
 
 
         /// <summary>
-        /// 取得學生所有可選類別 return idprefix:name
+        /// 取得學生所有可選類別 return prefix:name,id
         /// </summary>
         /// <returns></returns>
         public static Dictionary<string, string> GetStudentAllTag()
@@ -269,7 +269,7 @@ WHERE category =  'Student' ORDER BY prefix,name";
                     string tagName = dr["tag_name"].ToString();
 
                     if (!value.ContainsKey(tagName))
-                        value.Add(id, tagName);
+                        value.Add(tagName, id);
                 }
             }
             return value;

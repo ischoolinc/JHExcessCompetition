@@ -248,18 +248,16 @@ namespace PingTungExcessCompetition
                     if (rec.Cleared == "是")
                         continue;
 
-                    if (rec.RegisterDate.HasValue)
+                    if (rec.OccurDate > _Configure.EndDate)
+                        continue;
+                    else
                     {
-                        if (rec.RegisterDate.Value > _Configure.EndDate)
-                            continue;
-                        else
-                        {
-                            if (!DemeritRecordDict.ContainsKey(rec.RefStudentID))
-                                DemeritRecordDict.Add(rec.RefStudentID, new List<JHDemeritRecord>());
+                        if (!DemeritRecordDict.ContainsKey(rec.RefStudentID))
+                            DemeritRecordDict.Add(rec.RefStudentID, new List<JHDemeritRecord>());
 
-                            DemeritRecordDict[rec.RefStudentID].Add(rec);
-                        }
+                        DemeritRecordDict[rec.RefStudentID].Add(rec);
                     }
+
                 }
                 // 獎
                 Dictionary<string, List<JHMeritRecord>> MeritRecordDict = new Dictionary<string, List<JHMeritRecord>>();
@@ -332,7 +330,11 @@ namespace PingTungExcessCompetition
                     wst.Cells[wstRIdx, 12].PutValue(K12.Data.School.Code);
 
                     // 畢業年(民國年) 13
-                    wst.Cells[wstRIdx, 13].PutValue(K12.Data.School.DefaultSchoolYear);
+                    int gyear;
+                    if (int.TryParse(K12.Data.School.DefaultSchoolYear, out gyear))
+                    {
+                        wst.Cells[wstRIdx, 13].PutValue(gyear + 1);
+                    }
 
                     // 畢肄業 14
                     wst.Cells[wstRIdx, 14].PutValue(1);
@@ -684,7 +686,7 @@ namespace PingTungExcessCompetition
             List<string> selectItems = new List<string>();
             selectItems.Add("");
 
-            foreach (string name in StudentCanSelectTagDict.Values)
+            foreach (string name in StudentCanSelectTagDict.Keys)
             {
                 selectItems.Add(name);
             }
@@ -755,7 +757,10 @@ namespace PingTungExcessCompetition
                                     {
                                         if (drv.Cells[colItem1.Index].Value.ToString() == elm1.Attribute("Name").Value)
                                         {
-                                            drv.Cells[2].Value = elm1.Attribute("TagName").Value;
+                                            if (StudentCanSelectTagDict.ContainsKey(elm1.Attribute("TagName").Value))
+                                                drv.Cells[2].Value = elm1.Attribute("TagName").Value;
+                                            else
+                                                drv.Cells[2].Value = "";
                                             break;
                                         }
                                     }
@@ -771,7 +776,10 @@ namespace PingTungExcessCompetition
                                     {
                                         if (drv.Cells[colItem1.Index].Value.ToString() == elm1.Attribute("Name").Value)
                                         {
-                                            drv.Cells[2].Value = elm1.Attribute("TagName").Value;
+                                            if (StudentCanSelectTagDict.ContainsKey(elm1.Attribute("TagName").Value))
+                                                drv.Cells[2].Value = elm1.Attribute("TagName").Value;
+                                            else
+                                                drv.Cells[2].Value = "";
                                             break;
                                         }
                                     }
@@ -787,7 +795,10 @@ namespace PingTungExcessCompetition
                                     {
                                         if (drv.Cells[colItem1.Index].Value.ToString() == elm1.Attribute("Name").Value)
                                         {
-                                            drv.Cells[2].Value = elm1.Attribute("TagName").Value;
+                                            if (StudentCanSelectTagDict.ContainsKey(elm1.Attribute("TagName").Value))
+                                                drv.Cells[2].Value = elm1.Attribute("TagName").Value;
+                                            else
+                                                drv.Cells[2].Value = "";
                                             break;
                                         }
                                     }
@@ -798,7 +809,10 @@ namespace PingTungExcessCompetition
                             {
                                 foreach (XElement elm1 in elm.Elements("Item"))
                                 {
-                                    cboSelectTag4.Text = elm1.Attribute("TagName").Value;
+                                    if (StudentCanSelectTagDict.ContainsKey(elm1.Attribute("TagName").Value))
+                                        cboSelectTag4.Text = elm1.Attribute("TagName").Value;
+                                    else
+                                        cboSelectTag4.Text = "";
                                     break;
                                 }
                             }
