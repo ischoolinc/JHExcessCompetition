@@ -561,6 +561,8 @@ namespace PingTungExcessCompetition
             UserControlEnable(false);
 
             LoadTemplate();
+            if (_Configure.EndDate.Date.Year < DateTime.Now.Year)
+                _Configure.EndDate = new DateTime(DateTime.Now.Year, 4, 30);
             dtDate.Value = _Configure.EndDate;
 
             LoadConfig();
