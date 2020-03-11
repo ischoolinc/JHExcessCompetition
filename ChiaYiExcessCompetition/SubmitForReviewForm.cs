@@ -275,12 +275,13 @@ namespace ChiaYiExcessCompetition
                 }
 
                 // 取得服務學習時數
+                StudentInfoList = QueryData.FillServiceLearn(StudentIDList, StudentInfoList);
 
                 // 填入中低收入戶
                 StudentInfoList = QueryData.FillIncomeType(StudentIDList, StudentInfoList);
 
 
-                // 取得學生體適能資料並填入
+                // 取得學生體適能資料並填入,嘉義版不卡日期，日期傳入不會限制
                 StudentInfoList = QueryData.FillStudentFitness(StudentIDList, StudentInfoList, _Configure.EndDate);
 
                 // 填入 Excel 資料
@@ -458,16 +459,49 @@ namespace ChiaYiExcessCompetition
 
                     }
 
+                    // 計算分數
+                    if (SemesterScoreRecordDict.ContainsKey(si.StudentID))
+                    {
+                        si.CalcSemsScore5(SemesterScoreRecordDict[si.StudentID]);                      
+                    }
 
                     // 健康與體育 30
-                    // 藝術與人文 31
-                    // 綜合活動 32
+                    if (si.isDomainHelPass)
+                        wst.Cells[wstRIdx, 30].PutValue(1);
+                    else
+                        wst.Cells[wstRIdx, 30].PutValue(0);
 
+                    // 藝術與人文 31
+                    if (si.isDoaminArtPass)
+                        wst.Cells[wstRIdx, 31].PutValue(1);
+                    else
+                        wst.Cells[wstRIdx, 31].PutValue(0);
+
+                    // 綜合活動 32
+                    if (si.isDomainActPass)
+                        wst.Cells[wstRIdx, 32].PutValue(1);
+                    else
+                        wst.Cells[wstRIdx, 32].PutValue(0);
 
                     // 品德表現 33
+                    List<JHDemeritRecord> recD;
+                    List<JHMeritRecord> recM;
 
+                    if (DemeritRecordDict.ContainsKey(si.StudentID))
+                        recD = DemeritRecordDict[si.StudentID];
+                    else
+                        recD = new List<JHDemeritRecord>();
+
+                    if (MeritRecordDict.ContainsKey(si.StudentID))
+                        recM = MeritRecordDict[si.StudentID];
+                    else
+                        recM = new List<JHMeritRecord>();
+
+                    si.CalcDemeritMemeritScore(recD, recM, DemeritReduceRecord);
+                    wst.Cells[wstRIdx, 33].PutValue(si.MeritDemeritScore);
 
                     // 服務學習 34
+                    wst.Cells[wstRIdx, 34].PutValue(si.ServiceLearnScore);
 
                     // 體適能 35
                     si.CalcFitnessScore();

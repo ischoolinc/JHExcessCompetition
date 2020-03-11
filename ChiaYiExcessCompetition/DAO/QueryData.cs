@@ -236,11 +236,28 @@ FROM student_info_ext WHERE ref_student_id IN(" + string.Join(",", StudentIDList
         {
             try
             {
+
+                List<string> addStringList = new List<string>();
+                addStringList.Add("金牌");
+                addStringList.Add("銀牌");
+                addStringList.Add("銅牌");
+
+                // 嘉義版先不卡日期
                 // 取得特定日期前體適能資料
                 QueryHelper qh = new QueryHelper();
                 endDate = endDate.AddDays(1);
                 string strEndDate = endDate.Year + "-" + endDate.Month + "-" + endDate.Day;
                 Dictionary<string, List<DataRow>> finDict = new Dictionary<string, List<DataRow>>();
+                //                string qry = @"
+                //SELECT 
+                //ref_student_id
+                //,test_date
+                //,sit_and_reach_degree
+                //,standing_long_jump_degree
+                //,sit_up_degree
+                //,cardiorespiratory_degree
+                //FROM $ischool_student_fitness WHERE test_date <'" + strEndDate + @"' AND ref_student_id IN('" + string.Join("','", StudentIDList.ToArray()) + @"')
+                //";
                 string qry = @"
 SELECT 
 ref_student_id
@@ -249,8 +266,9 @@ ref_student_id
 ,standing_long_jump_degree
 ,sit_up_degree
 ,cardiorespiratory_degree
-FROM $ischool_student_fitness WHERE test_date <'" + strEndDate + @"' AND ref_student_id IN('" + string.Join("','", StudentIDList.ToArray()) + @"')
+FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", StudentIDList.ToArray()) + @"')
 ";
+
                 DataTable dt = qh.Select(qry);
                 if (dt != null)
                 {
@@ -269,8 +287,12 @@ FROM $ischool_student_fitness WHERE test_date <'" + strEndDate + @"' AND ref_stu
                 {
                     if (finDict.ContainsKey(si.StudentID))
                     {
+                        si.isAddFitnessScore = false;
+
                         foreach (DataRow dr in finDict[si.StudentID])
                         {
+                            int addCount = 0;
+
                             // sit_and_reach_degree
                             if (dr["sit_and_reach_degree"] != null)
                             {
@@ -282,6 +304,8 @@ FROM $ischool_student_fitness WHERE test_date <'" + strEndDate + @"' AND ref_stu
                                 else
                                 {
                                     si.sit_and_reach_degreeList.Add(ss);
+                                    if (addStringList.Contains(ss))
+                                        addCount++;
                                 }
                             }
 
@@ -296,6 +320,8 @@ FROM $ischool_student_fitness WHERE test_date <'" + strEndDate + @"' AND ref_stu
                                 else
                                 {
                                     si.standing_long_jump_degreeList.Add(ss);
+                                    if (addStringList.Contains(ss))
+                                        addCount++;
                                 }
                             }
 
@@ -310,6 +336,8 @@ FROM $ischool_student_fitness WHERE test_date <'" + strEndDate + @"' AND ref_stu
                                 else
                                 {
                                     si.sit_up_degreeList.Add(ss);
+                                    if (addStringList.Contains(ss))
+                                        addCount++;
                                 }
                             }
 
@@ -324,8 +352,15 @@ FROM $ischool_student_fitness WHERE test_date <'" + strEndDate + @"' AND ref_stu
                                 else
                                 {
                                     si.cardiorespiratory_degreeList.Add(ss);
+                                    if (addStringList.Contains(ss))
+                                        addCount++;
                                 }
                             }
+
+                            // 4 次都符合銅牌以上，符合加分
+                            if (addCount == 4)
+                                si.isAddFitnessScore = true;
+
                         }
 
                     }
@@ -370,6 +405,61 @@ WHERE category =  'Student' ORDER BY prefix,name";
             return value;
         }
 
+
+        /// <summary>
+        /// 取得服務學習時數並填入
+        /// </summary>
+        /// <param name="StudentIDList"></param>
+        /// <param name="StudentInfoList"></param>
+        /// <returns></returns>
+        public static List<StudentInfo> FillServiceLearn(List<string> StudentIDList, List<StudentInfo> StudentInfoList)
+        {
+            Dictionary<string, int> srDict = new Dictionary<string, int>();
+            try
+            {
+                QueryHelper qh = new QueryHelper();
+                string qry = @"
+SELECT ref_student_id AS student_id,count(ref_student_id) AS hour_count FROM $k12.service.learning.record WHERE hours >= 2 AND ref_student_id IN('" + string.Join("','", StudentIDList.ToArray()) + @"') 
+GROUP BY ref_student_id
+";
+                DataTable dt = qh.Select(qry);
+
+                if (dt != null)
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        string sid = dr["student_id"].ToString();
+                        int hr;
+                        if (int.TryParse(dr["hour_count"].ToString(), out hr))
+                        {
+                            if (!srDict.ContainsKey(sid))
+                            {
+                                srDict.Add(sid, hr);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            foreach (StudentInfo si in StudentInfoList)
+            {
+                if (srDict.ContainsKey(si.StudentID))
+                {
+                    si.ServiceLearnScore = srDict[si.StudentID];
+                    // 最高8分
+                    if (si.ServiceLearnScore > 8)
+                        si.ServiceLearnScore = 8;
+                }
+
+            }
+
+
+            return StudentInfoList;
+        }
 
     }
 }

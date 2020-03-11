@@ -51,6 +51,18 @@ namespace ChiaYiExcessCompetition.DAO
         public bool HasScore2 = false;
         public bool HasScore3 = false;
 
+        // 健康與體育
+        public bool isDomainHelPass = false;
+        // 綜合活動
+        public bool isDomainActPass = false;
+        // 藝術與人文
+        public bool isDoaminArtPass = false;
+
+        /// <summary>
+        /// 服務學習時數分數
+        /// </summary>
+        public int ServiceLearnScore = 0;
+
         /// <summary>
         /// 學校代碼
         /// </summary>
@@ -61,7 +73,7 @@ namespace ChiaYiExcessCompetition.DAO
         /// </summary>
         public List<SemsHistoryInfo> SemsHistoryInfoList = new List<SemsHistoryInfo>();
 
-      
+
         /// <summary>
         /// 一上服務內容
         /// </summary>
@@ -114,6 +126,12 @@ namespace ChiaYiExcessCompetition.DAO
         public int FitnessScore = 0;
 
         /// <summary>
+        /// 體適能是否加分
+        /// </summary>
+        public bool isAddFitnessScore = false;
+
+
+        /// <summary>
         /// 是否低輸入
         /// </summary>
         public bool incomeType1 = false;
@@ -131,7 +149,7 @@ namespace ChiaYiExcessCompetition.DAO
 
         public List<int> CompetitionScoreD = new List<int>();
 
-      
+
 
         /// <summary>
         /// 計算均衡學習
@@ -142,6 +160,11 @@ namespace ChiaYiExcessCompetition.DAO
             Semester5Score = 0;
             hasSemester5Score = true;
             decimal score1 = 0, score2 = 0, score3 = 0;
+
+            isDomainHelPass = false;
+            isDomainActPass = false;
+            isDoaminArtPass = false;
+
 
             List<string> tmpList = new List<string>();
             foreach (SemsHistoryInfo sh in SemsHistoryInfoList)
@@ -206,14 +229,24 @@ namespace ChiaYiExcessCompetition.DAO
             }
 
             if ((score1 / 5) >= 60)
+            {
                 Semester5Score += 3;
+                isDomainHelPass = true;
+            }
+
 
             if ((score2 / 5) >= 60)
+            {
                 Semester5Score += 3;
+                isDoaminArtPass = true;
+            }
+
 
             if ((score3 / 5) >= 60)
+            {
                 Semester5Score += 3;
-
+                isDomainActPass = true;
+            }
 
         }
 
@@ -223,22 +256,24 @@ namespace ChiaYiExcessCompetition.DAO
         public void CalcDemeritMemeritScore(List<JHDemeritRecord> recD, List<JHMeritRecord> recM, JHMeritDemeritReduceRecord mdr)
         {
             int SumRecD = 0, SumRecM = 0;
+            // 沒有記錄預設 6 分
+            MeritDemeritScore = 6;
 
-
+            // 使用公布計算方式，不使用系統內功過換算
             int da = 3, db = 3, ma = 3, mb = 3;
 
-            // 功過換算
-            if (mdr.DemeritAToDemeritB.HasValue)
-                da = mdr.DemeritAToDemeritB.Value;
+            //// 功過換算
+            //if (mdr.DemeritAToDemeritB.HasValue)
+            //    da = mdr.DemeritAToDemeritB.Value;
 
-            if (mdr.DemeritBToDemeritC.HasValue)
-                db = mdr.DemeritBToDemeritC.Value;
+            //if (mdr.DemeritBToDemeritC.HasValue)
+            //    db = mdr.DemeritBToDemeritC.Value;
 
-            if (mdr.MeritAToMeritB.HasValue)
-                ma = mdr.MeritAToMeritB.Value;
+            //if (mdr.MeritAToMeritB.HasValue)
+            //    ma = mdr.MeritAToMeritB.Value;
 
-            if (mdr.MeritBToMeritC.HasValue)
-                mb = mdr.MeritBToMeritC.Value;
+            //if (mdr.MeritBToMeritC.HasValue)
+            //    mb = mdr.MeritBToMeritC.Value;
 
             foreach (JHDemeritRecord rec in recD)
             {
@@ -257,34 +292,44 @@ namespace ChiaYiExcessCompetition.DAO
                 SumRecD += c1;
             }
 
-            //foreach (JHMeritRecord rec in recM)
-            //{
-            //    int b1 = 0, c1 = 0; ;
-            //    if (rec.MeritA.HasValue)
-            //        b1 = ma * rec.MeritA.Value;
-            //    if (rec.MeritB.HasValue)
-            //    {
-            //        b1 += rec.MeritB.Value;
-            //    }
+            foreach (JHMeritRecord rec in recM)
+            {
+                int b1 = 0, c1 = 0; ;
+                if (rec.MeritA.HasValue)
+                    b1 = ma * rec.MeritA.Value;
+                if (rec.MeritB.HasValue)
+                {
+                    b1 += rec.MeritB.Value;
+                }
 
-            //    if (rec.MeritC.HasValue)
-            //        c1 = rec.MeritC.Value;
+                if (rec.MeritC.HasValue)
+                    c1 = rec.MeritC.Value;
 
-            //    c1 += b1 * mb;   // 都換成獎勵
-            //    SumRecM += c1;
-            //}
+                c1 += b1 * mb;   // 都換成獎勵
+                SumRecM += c1;
+            }
 
-            // 功過相抵 (//使用這提到不功過相抵)  sum = SumRecD - SumRecM;
-            int sum = SumRecD;
+            // 功過相抵   sum = SumRecD - SumRecM;
+            int sum = SumRecD - SumRecM;
 
-            if (sum < 1)
-                MeritDemeritScore = 10;
-            else if (sum < db)
-                MeritDemeritScore = 7;
-            else if (sum < (db * 2))
-                MeritDemeritScore = 4;
+            if (sum >= 0)
+            {
+                MeritDemeritScore += sum;
+            }
+            else if (sum > -9)
+            {
+                // 懲戒未達大過
+                MeritDemeritScore = 3;
+            }
             else
+            {
                 MeritDemeritScore = 0;
+            }
+
+            // 最高 12 分
+            if (MeritDemeritScore > 12)
+                MeritDemeritScore = 12;
+
         }
 
         /// <summary>
@@ -300,8 +345,9 @@ namespace ChiaYiExcessCompetition.DAO
         /// </summary>
         public void CalcFitnessScore()
         {
-            int ItemCount = 0, passCount = 0;
+            int score = 0;
 
+            // 嘉義版最高9分，每項獲得中等，給3分，最高9分，四項都有銅牌以上加1分
 
             // 符合達標字串
             List<string> passStringList = new List<string>();
@@ -313,28 +359,19 @@ namespace ChiaYiExcessCompetition.DAO
 
 
             if (isSpecial)
-            {// 有身心手冊 8分
-                FitnessScore = 8;
+            {// 有身心手冊 9分
+                FitnessScore = 9;
             }
             else
             {
                 FitnessScore = 0;
-
-                if (sit_and_reach_degreeList.Count > 0)
-                    ItemCount += 1;
-                if (standing_long_jump_degreeList.Count > 0)
-                    ItemCount += 1;
-                if (sit_up_degreeList.Count > 0)
-                    ItemCount += 1;
-                if (cardiorespiratory_degreeList.Count > 0)
-                    ItemCount += 1;
 
                 // 檢查四項資料
                 foreach (string name in passStringList)
                 {
                     if (sit_and_reach_degreeList.Contains(name))
                     {
-                        passCount += 1;
+                        score += 3;
                         break;
                     }
                 }
@@ -343,7 +380,7 @@ namespace ChiaYiExcessCompetition.DAO
                 {
                     if (standing_long_jump_degreeList.Contains(name))
                     {
-                        passCount += 1;
+                        score += 3;
                         break;
                     }
                 }
@@ -352,7 +389,7 @@ namespace ChiaYiExcessCompetition.DAO
                 {
                     if (sit_up_degreeList.Contains(name))
                     {
-                        passCount += 1;
+                        score += 3;
                         break;
                     }
                 }
@@ -361,29 +398,20 @@ namespace ChiaYiExcessCompetition.DAO
                 {
                     if (cardiorespiratory_degreeList.Contains(name))
                     {
-                        passCount += 1;
+                        score += 3;
                         break;
                     }
                 }
 
-                if (ItemCount == 4)
-                {
-                    // 有四項但都未達標 2 分
-                    FitnessScore = 2;
+                if (score > 9)
+                    score = 9;
 
-                    if (passCount == 1)
-                        FitnessScore = 4;
+                // 檢查每次是否都有銅牌
+                if (isAddFitnessScore)
+                    score += 1;
 
-                    if (passCount == 2)
-                        FitnessScore = 6;
+                FitnessScore = score;
 
-                    if (passCount == 3)
-                        FitnessScore = 8;
-
-                    if (passCount == 4)
-                        FitnessScore = 10;
-
-                }
             }
         }
 
