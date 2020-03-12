@@ -17,5 +17,10 @@ namespace PingTungExcessCompetition.DAO
         public string Semester { get; set; }
         public string ReferenceType { get; set; }
         public string CadreName { get; set; }
+
+        /// <summary>
+        /// 說明欄位
+        /// </summary>
+        public string Text { get; set; }
     }
 }

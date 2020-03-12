@@ -139,6 +139,7 @@ SELECT
         ,semester
         ,referencetype
         ,cadrename
+        ,text 
  FROM 
     student INNER JOIN $behavior.thecadre
          ON student.id = CAST($behavior.thecadre.studentid AS INTEGER) 
@@ -162,6 +163,7 @@ SELECT
                         ci.Semester = dr["semester"].ToString();
                         ci.ReferenceType = dr["referencetype"].ToString();
                         ci.CadreName = dr["cadrename"].ToString();
+                        ci.Text = dr["text"].ToString();
                         studCadDict[sid].Add(ci);
                     }
                 }

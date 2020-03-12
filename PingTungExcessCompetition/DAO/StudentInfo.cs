@@ -180,7 +180,10 @@ namespace PingTungExcessCompetition.DAO
                                 {
                                     //  HasScore2 = true;
                                     ServiceScore += 2;
-                                    ServiceItem_7a.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_7a.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_7a.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else
                                 {
@@ -386,7 +389,8 @@ namespace PingTungExcessCompetition.DAO
             // 3.符合基本條件 2 領域五學期平均成績達及格以上者，計 6 分。
             // 4.符合基本條件 3 領域五學期平均成
             //績達及格以上者，計 9 分。"
-            // 佳樺提供需求需要使用原始成績
+            // 佳樺提供需求需要使用原始成績，經過詢問學校老師，計算平均四捨五入後再比較是否取得積分。
+
 
             foreach (JHSemesterScoreRecord semsRec in SemsScoreList)
             {
@@ -416,13 +420,17 @@ namespace PingTungExcessCompetition.DAO
                 }
             }
 
-            if ((score1 / 5) >= 60)
+            score1 = Math.Round(score1 / 5, 0, MidpointRounding.AwayFromZero);
+            score2 = Math.Round(score2 / 5, 0, MidpointRounding.AwayFromZero);
+            score3 = Math.Round(score3 / 5, 0, MidpointRounding.AwayFromZero);
+
+            if (score1 >= 60)
                 Semester5Score += 3;
 
-            if ((score2 / 5) >= 60)
+            if (score2 >= 60)
                 Semester5Score += 3;
 
-            if ((score3 / 5) >= 60)
+            if (score3 >= 60)
                 Semester5Score += 3;
 
 
