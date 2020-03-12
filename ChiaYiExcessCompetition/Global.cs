@@ -16,5 +16,6 @@ namespace ChiaYiExcessCompetition
 
         public static string _DefaultConfTypeName = "預設設定檔";
 
+        public static void ExportMappingFieldWord() { }
     }
 }

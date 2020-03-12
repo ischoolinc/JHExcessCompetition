@@ -412,14 +412,17 @@ WHERE category =  'Student' ORDER BY prefix,name";
         /// <param name="StudentIDList"></param>
         /// <param name="StudentInfoList"></param>
         /// <returns></returns>
-        public static List<StudentInfo> FillServiceLearn(List<string> StudentIDList, List<StudentInfo> StudentInfoList)
+        public static List<StudentInfo> FillServiceLearn(List<string> StudentIDList, List<StudentInfo> StudentInfoList, DateTime endDate)
         {
-            Dictionary<string, int> srDict = new Dictionary<string, int>();
+            Dictionary<string, decimal> srDict = new Dictionary<string, decimal>();
+            endDate = endDate.AddDays(1);
+            string strEndDate = endDate.Year + "-" + endDate.Month + "-" + endDate.Day;
+
             try
             {
                 QueryHelper qh = new QueryHelper();
                 string qry = @"
-SELECT ref_student_id AS student_id,count(ref_student_id) AS hour_count FROM $k12.service.learning.record WHERE hours >= 2 AND ref_student_id IN('" + string.Join("','", StudentIDList.ToArray()) + @"') 
+SELECT ref_student_id AS student_id,sum(hours) AS hour_sum FROM $k12.service.learning.record WHERE occur_date < '" + strEndDate + @"' AND ref_student_id IN('" + string.Join("','", StudentIDList.ToArray()) + @"') 
 GROUP BY ref_student_id
 ";
                 DataTable dt = qh.Select(qry);
@@ -429,8 +432,8 @@ GROUP BY ref_student_id
                     foreach (DataRow dr in dt.Rows)
                     {
                         string sid = dr["student_id"].ToString();
-                        int hr;
-                        if (int.TryParse(dr["hour_count"].ToString(), out hr))
+                        decimal hr;
+                        if (decimal.TryParse(dr["hour_sum"].ToString(), out hr))
                         {
                             if (!srDict.ContainsKey(sid))
                             {
@@ -449,7 +452,7 @@ GROUP BY ref_student_id
             {
                 if (srDict.ContainsKey(si.StudentID))
                 {
-                    si.ServiceLearnScore = srDict[si.StudentID];
+                    si.ServiceLearnScore = (int)(srDict[si.StudentID] / 2);
                     // 最高8分
                     if (si.ServiceLearnScore > 8)
                         si.ServiceLearnScore = 8;
@@ -460,6 +463,20 @@ GROUP BY ref_student_id
 
             return StudentInfoList;
         }
+
+
+        /// <summary>
+        /// 取得成績冊用學生基本資料
+        /// </summary>
+        /// <param name="StudentIDList"></param>
+        /// <returns></returns>
+        public static List<rptStudentInfo> GetRptStudentInfoListByIDs(List<string> StudentIDList)
+        {
+            List<rptStudentInfo> StudentInfoList = new List<rptStudentInfo>();
+
+            return StudentInfoList;
+        }
+
 
     }
 }

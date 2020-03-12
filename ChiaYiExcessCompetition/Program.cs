@@ -20,8 +20,18 @@ namespace ChiaYiExcessCompetition
             rbItem1["報表"]["嘉義免試入學"]["免試入學成績冊"].Enable = UserAcl.Current["7EE379CC-41BC-4A31-A403-232F0D0F6EB0"].Executable;
             rbItem1["報表"]["嘉義免試入學"]["免試入學成績冊"].Click += delegate
             {
+                if (K12.Presentation.NLDPanels.Student.SelectedSource.Count > 0)
+                {
+                    ScoreReportForm srf = new ScoreReportForm();
+                    srf.SetStudentIDs(K12.Presentation.NLDPanels.Student.SelectedSource);
+                    srf.ShowDialog();
 
-
+                }
+                else
+                {
+                    FISCA.Presentation.Controls.MsgBox.Show("請選擇選學生");
+                    return;
+                }
             };
 
             // 嘉義免試入學-免試入學成績冊

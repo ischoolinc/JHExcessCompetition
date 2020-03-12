@@ -275,7 +275,7 @@ namespace ChiaYiExcessCompetition
                 }
 
                 // 取得服務學習時數
-                StudentInfoList = QueryData.FillServiceLearn(StudentIDList, StudentInfoList);
+                StudentInfoList = QueryData.FillServiceLearn(StudentIDList, StudentInfoList,_Configure.EndDate);
 
                 // 填入中低收入戶
                 StudentInfoList = QueryData.FillIncomeType(StudentIDList, StudentInfoList);

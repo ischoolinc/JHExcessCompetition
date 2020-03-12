@@ -69,5 +69,25 @@ namespace ChiaYiExcessCompetition.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   查詢類型 System.Byte[] 的當地語系化資源。
+        /// </summary>
+        internal static byte[] 嘉義區成績冊合併欄位總表 {
+            get {
+                object obj = ResourceManager.GetObject("嘉義區成績冊合併欄位總表", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Byte[] 的當地語系化資源。
+        /// </summary>
+        internal static byte[] 嘉義區成績冊樣板 {
+            get {
+                object obj = ResourceManager.GetObject("嘉義區成績冊樣板", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

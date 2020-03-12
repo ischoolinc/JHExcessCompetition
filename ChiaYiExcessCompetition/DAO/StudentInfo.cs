@@ -198,7 +198,7 @@ namespace ChiaYiExcessCompetition.DAO
             // 3.符合基本條件 2 領域五學期平均成績達及格以上者，計 6 分。
             // 4.符合基本條件 3 領域五學期平均成
             //績達及格以上者，計 9 分。"
-            // 佳樺提供需求需要使用原始成績
+            // 佳樺提供需求需要使用擇優成績，平均計算到整數四捨五入。
 
             foreach (JHSemesterScoreRecord semsRec in SemsScoreList)
             {
@@ -209,40 +209,42 @@ namespace ChiaYiExcessCompetition.DAO
                     {
                         if (dname == "健康體育" || dname == "健康與體育")
                         {
-                            if (semsRec.Domains[dname].ScoreOrigin.HasValue)
-                                score1 += semsRec.Domains[dname].ScoreOrigin.Value;
+                            if (semsRec.Domains[dname].Score.HasValue)
+                                score1 += semsRec.Domains[dname].Score.Value;
                         }
 
                         if (dname == "藝術人文" || dname == "藝術與人文")
                         {
-                            if (semsRec.Domains[dname].ScoreOrigin.HasValue)
-                                score2 += semsRec.Domains[dname].ScoreOrigin.Value;
+                            if (semsRec.Domains[dname].Score.HasValue)
+                                score2 += semsRec.Domains[dname].Score.Value;
                         }
 
                         if (dname == "綜合活動")
                         {
-                            if (semsRec.Domains[dname].ScoreOrigin.HasValue)
-                                score3 += semsRec.Domains[dname].ScoreOrigin.Value;
+                            if (semsRec.Domains[dname].Score.HasValue)
+                                score3 += semsRec.Domains[dname].Score.Value;
                         }
                     }
                 }
             }
 
-            if ((score1 / 5) >= 60)
+            score1 = Math.Round(score1 / 5, 0, MidpointRounding.AwayFromZero);
+            score2 = Math.Round(score2 / 5, 0, MidpointRounding.AwayFromZero);
+            score3 = Math.Round(score3 / 5, 0, MidpointRounding.AwayFromZero);
+
+            if (score1 >= 60)
             {
                 Semester5Score += 3;
                 isDomainHelPass = true;
             }
 
-
-            if ((score2 / 5) >= 60)
+            if (score2 >= 60)
             {
                 Semester5Score += 3;
                 isDoaminArtPass = true;
             }
 
-
-            if ((score3 / 5) >= 60)
+            if (score3 >= 60)
             {
                 Semester5Score += 3;
                 isDomainActPass = true;
@@ -309,8 +311,14 @@ namespace ChiaYiExcessCompetition.DAO
                 SumRecM += c1;
             }
 
-            // 功過相抵   sum = SumRecD - SumRecM;
-            int sum = SumRecD - SumRecM;
+            //if (StudentID == "309")
+            //{
+            //    Console.Write("");
+            //}
+
+
+            // 功過相抵   
+            int sum = SumRecM - SumRecD;
 
             if (sum >= 0)
             {
