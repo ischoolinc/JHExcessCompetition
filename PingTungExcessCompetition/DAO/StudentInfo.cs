@@ -168,13 +168,19 @@ namespace PingTungExcessCompetition.DAO
                                 {
                                     // HasScore3 = true;
                                     ServiceScore += 2;
-                                    ServiceItem_7a.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_7a.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_7a.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else if (ci.ReferenceType == "班級幹部" && CadreNameFilter.Contains(ci.CadreName))
                                 {
                                     //  HasScore1 = true;
                                     ServiceScore += 3;
-                                    ServiceItem_7a.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_7a.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_7a.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else if (ci.ReferenceType == "社團幹部" && ci.CadreName == "社長")
                                 {
@@ -203,19 +209,28 @@ namespace PingTungExcessCompetition.DAO
                                 {
                                     // HasScore3 = true;
                                     ServiceScore += 2;
-                                    ServiceItem_7b.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_7b.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_7b.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else if (ci.ReferenceType == "班級幹部" && CadreNameFilter.Contains(ci.CadreName))
                                 {
                                     //  HasScore1 = true;
                                     ServiceScore += 3;
-                                    ServiceItem_7b.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_7b.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_7b.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else if (ci.ReferenceType == "社團幹部" && ci.CadreName == "社長")
                                 {
                                     // HasScore2 = true;
                                     ServiceScore += 2;
-                                    ServiceItem_7b.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_7b.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_7b.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else
                                 {
@@ -238,19 +253,28 @@ namespace PingTungExcessCompetition.DAO
                                 {
                                     // HasScore3 = true;
                                     ServiceScore += 2;
-                                    ServiceItem_8a.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_8a.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_8a.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else if (ci.ReferenceType == "班級幹部" && CadreNameFilter.Contains(ci.CadreName))
                                 {
                                     // HasScore1 = true;
                                     ServiceScore += 3;
-                                    ServiceItem_8a.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_8a.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_8a.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else if (ci.ReferenceType == "社團幹部" && ci.CadreName == "社長")
                                 {
                                     // HasScore2 = true;
                                     ServiceScore += 2;
-                                    ServiceItem_8a.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_8a.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_8a.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else
                                 {
@@ -270,19 +294,28 @@ namespace PingTungExcessCompetition.DAO
                                 {
                                     // HasScore3 = true;
                                     ServiceScore += 2;
-                                    ServiceItem_8b.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_8b.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_8b.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else if (ci.ReferenceType == "班級幹部" && CadreNameFilter.Contains(ci.CadreName))
                                 {
                                     //HasScore1 = true;
                                     ServiceScore += 3;
-                                    ServiceItem_8b.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_8b.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_8b.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else if (ci.ReferenceType == "社團幹部" && ci.CadreName == "社長")
                                 {
                                     //  HasScore2 = true;
                                     ServiceScore += 2;
-                                    ServiceItem_8b.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_8b.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_8b.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else
                                 {
@@ -306,19 +339,28 @@ namespace PingTungExcessCompetition.DAO
                                 {
                                     //HasScore3 = true;
                                     ServiceScore += 2;
-                                    ServiceItem_9a.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_9a.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_9a.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else if (ci.ReferenceType == "班級幹部" && CadreNameFilter.Contains(ci.CadreName))
                                 {
                                     // HasScore1 = true;
                                     ServiceScore += 3;
-                                    ServiceItem_9a.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_9a.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_9a.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else if (ci.ReferenceType == "社團幹部" && ci.CadreName == "社長")
                                 {
                                     // HasScore2 = true;
                                     ServiceScore += 2;
-                                    ServiceItem_9a.Add(ci.CadreName);
+                                    if (string.IsNullOrWhiteSpace(ci.Text))
+                                        ServiceItem_9a.Add(ci.CadreName);
+                                    else
+                                        ServiceItem_9a.Add(ci.CadreName + "(" + ci.Text + ")");
                                 }
                                 else
                                 {
