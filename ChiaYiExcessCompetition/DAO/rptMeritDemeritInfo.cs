@@ -30,32 +30,32 @@ namespace ChiaYiExcessCompetition.DAO
         /// <summary>
         /// 品德表現_獎懲_大功
         /// </summary>
-        public string MA { get; set; }
+        public int MA = 0;
 
         /// <summary>
         /// 品德表現_獎懲_小功
         /// </summary>
-        public string MB { get; set; }
+        public int MB = 0;
 
         /// <summary>
         /// 品德表現_獎懲_嘉獎
         /// </summary>
-        public string MC { get; set; }
+        public int MC = 0;
 
         /// <summary>
         /// 品德表現_獎懲_大過
         /// </summary>
-        public string DA { get; set; }
+        public int DA = 0;
 
         /// <summary>
         /// 品德表現_獎懲_小過
         /// </summary>
-        public string DB { get; set; }
+        public int DB = 0;
 
         /// <summary>
         /// 品德表現_獎懲_警告
         /// </summary>
-        public string DC { get; set; }
+        public int DC = 0;
 
         /// <summary>
         /// 品德表現_獎懲_銷過

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FISCA.Data;
 using System.Data;
 using System.Xml.Linq;
+using JHSchool.Data;
 
 namespace ChiaYiExcessCompetition.DAO
 {
@@ -479,20 +480,21 @@ GROUP BY ref_student_id
                 QueryHelper qh = new QueryHelper();
                 string qry = @"
 SELECT 
-student.id AS student_id
-,class.class_name
-,student.seat_no
-,CASE student.gender WHEN '1' THEN '男' WHEN '0' THEN '女' ELSE '' END AS gender
-,student.name AS student_name 
+        student.id AS student_id
+        ,class.class_name
+        ,student.seat_no
+        ,CASE student.gender WHEN '1' THEN '男' WHEN '0' THEN '女' ELSE '' END AS gender
+        ,student.name AS student_name
+        ,sems_history 
 FROM student LEFT JOIN class 
 ON student.ref_class_id = class.id 
 WHERE student.status = 1 AND student.id IN(" + string.Join(",", StudentIDList.ToArray()) + @")
 ORDER BY class.grade_year DESC,class.display_order,class.class_name,seat_no
 ";
                 DataTable dt = qh.Select(qry);
-                if (dt!= null)
+                if (dt != null)
                 {
-                    foreach(DataRow dr in dt.Rows)
+                    foreach (DataRow dr in dt.Rows)
                     {
                         rptStudentInfo si = new rptStudentInfo();
                         si.StudentID = dr["student_id"].ToString();
@@ -503,8 +505,67 @@ ORDER BY class.grade_year DESC,class.display_order,class.class_name,seat_no
                         si.SchoolName = K12.Data.School.ChineseName;
                         si.Name = dr["student_name"].ToString();
 
+                        // 處理學期歷程
+                        if (dr["sems_history"] != null)
+                        {
+                            try
+                            {
+                                XElement elms = XElement.Parse("<root>" + dr["sems_history"].ToString() + "</root>");
+                                foreach (XElement elm in elms.Elements("History"))
+                                {
+                                    SemsHistoryInfo shi = new SemsHistoryInfo();
+                                    if (elm.Attribute("SchoolYear") != null)
+                                        shi.SchoolYear = elm.Attribute("SchoolYear").Value;
+
+                                    if (elm.Attribute("Semester") != null)
+                                        shi.Semester = elm.Attribute("Semester").Value;
+
+                                    if (elm.Attribute("GradeYear") != null)
+                                        shi.GradeYear = elm.Attribute("GradeYear").Value;
+
+                                    string key = shi.SchoolYear + "_" + shi.Semester;
+
+                                    string value = "";
+                                    if (shi.GradeYear == "1" || shi.GradeYear == "7")
+                                    {
+                                        if (shi.Semester == "1")
+                                            value = "七上";
+
+                                        if (shi.Semester == "2")
+                                            value = "七下";
+                                    }
+
+                                    if (shi.GradeYear == "2" || shi.GradeYear == "8")
+                                    {
+                                        if (shi.Semester == "1")
+                                            value = "八上";
+
+                                        if (shi.Semester == "2")
+                                            value = "八下";
+                                    }
+
+                                    if (shi.GradeYear == "3" || shi.GradeYear == "9")
+                                    {
+                                        if (shi.Semester == "1")
+                                            value = "九上";
+                                    }
+
+                                    if (value != "")
+                                    {
+                                        if (!si.SemsHistoryDict.ContainsKey(key))
+                                            si.SemsHistoryDict.Add(key, value);
+                                    }
+
+
+                                    si.SemsHistoryInfoList.Add(shi);
+                                }
+
+                            }
+                            catch (Exception ex) { }
+                        }
+
                         StudentInfoList.Add(si);
-                    }                 
+                    }
 
                 }
 
@@ -513,8 +574,73 @@ ORDER BY class.grade_year DESC,class.display_order,class.class_name,seat_no
             return StudentInfoList;
         }
 
+        /// <summary>
+        /// 取得領域資料並填入
+        /// </summary>
+        /// <param name="StudentIDList"></param>
+        /// <param name="StudentInfoList"></param>
+        /// <returns></returns>
         public static List<rptStudentInfo> FillRptDomainScoreInfo(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList)
         {
+            // 取得學生學期成績
+            Dictionary<string, List<JHSemesterScoreRecord>> SemesterScoreRecordDict = new Dictionary<string, List<JHSemesterScoreRecord>>();
+            List<JHSemesterScoreRecord> tmpSemsScore = JHSemesterScore.SelectByStudentIDs(StudentIDList);
+            foreach (JHSemesterScoreRecord rec in tmpSemsScore)
+            {
+                if (!SemesterScoreRecordDict.ContainsKey(rec.RefStudentID))
+                    SemesterScoreRecordDict.Add(rec.RefStudentID, new List<JHSemesterScoreRecord>());
+
+                SemesterScoreRecordDict[rec.RefStudentID].Add(rec);
+            }
+
+            // 填入學期成績
+
+            List<string> tmpDomainNameList = new List<string>();
+            tmpDomainNameList.Add("健康體育");
+            tmpDomainNameList.Add("健康與體育");
+            tmpDomainNameList.Add("藝術人文");
+            tmpDomainNameList.Add("藝術與人文");
+            tmpDomainNameList.Add("綜合活動");
+
+            foreach (rptStudentInfo si in StudentInfoList)
+            {
+                if (SemesterScoreRecordDict.ContainsKey(si.StudentID))
+                {
+                    foreach (JHSemesterScoreRecord semsRec in SemesterScoreRecordDict[si.StudentID])
+                    {
+                        string key = semsRec.SchoolYear + "_" + semsRec.Semester;
+
+                        // 學期歷程有
+                        if (si.SemsHistoryDict.ContainsKey(key))
+                        {
+                            foreach (string dname in semsRec.Domains.Keys)
+                            {
+                                if (tmpDomainNameList.Contains(dname))
+                                {
+                                    if (semsRec.Domains[dname].Score.HasValue)
+                                    {
+                                        if (!si.DomainScoreInfoDict.ContainsKey(dname))
+                                        {
+                                            rptDomainScoreInfo ds = new rptDomainScoreInfo();
+                                            ds.StudentID = si.StudentID;
+                                            ds.Name = dname;
+                                            si.DomainScoreInfoDict.Add(dname, ds);
+                                        }
+
+                                        if (!si.DomainScoreInfoDict[dname].ScoreDict.ContainsKey(si.SemsHistoryDict[key]))
+                                            si.DomainScoreInfoDict[dname].ScoreDict.Add(si.SemsHistoryDict[key], semsRec.Domains[dname].Score.Value);
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 計算成績
+                si.CalcDomainScoreInfoList();
+            }
+
             return StudentInfoList;
         }
 
@@ -523,9 +649,148 @@ ORDER BY class.grade_year DESC,class.display_order,class.class_name,seat_no
             return StudentInfoList;
         }
 
-        public static List<rptStudentInfo> FillRptMeritDemeritInfo(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList, DateTime endDate) { return StudentInfoList; }
+        public static List<rptStudentInfo> FillRptMeritDemeritInfo(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList, DateTime endDate)
+        {
+            List<JHDisciplineRecord> tmpRecordList = JHDiscipline.SelectByStudentIDs(StudentIDList);
+            List<JHDisciplineRecord> DisciplineRecordList = new List<JHDisciplineRecord>();
+            foreach (JHDisciplineRecord rec in tmpRecordList)
+            {
+                if (rec.OccurDate > endDate)
+                    continue;
+                DisciplineRecordList.Add(rec);
+            }
 
-        public static List<rptStudentInfo> FillRptServiceInfo(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList, DateTime endDate) { return StudentInfoList; }
+            // 依日期排序
+            DisciplineRecordList = DisciplineRecordList.OrderBy(x => x.OccurDate).ToList();
+
+            Dictionary<string, List<JHDisciplineRecord>> DisciplineRecordDict = new Dictionary<string, List<JHDisciplineRecord>>();
+            foreach (JHDisciplineRecord rec in DisciplineRecordList)
+            {
+                if (!DisciplineRecordDict.ContainsKey(rec.RefStudentID))
+                    DisciplineRecordDict.Add(rec.RefStudentID, new List<JHDisciplineRecord>());
+
+                DisciplineRecordDict[rec.RefStudentID].Add(rec);
+            }
+
+            foreach (rptStudentInfo si in StudentInfoList)
+            {
+                if (DisciplineRecordDict.ContainsKey(si.StudentID))
+                {
+                    foreach (JHDisciplineRecord rec in DisciplineRecordDict[si.StudentID])
+                    {
+                        string shKey = rec.SchoolYear + "_" + rec.Semester;
+
+                        rptMeritDemeritInfo mdi = new rptMeritDemeritInfo();
+
+                        if (si.SemsHistoryDict.ContainsKey(shKey))
+                        {
+                            mdi.Semester = si.SemsHistoryDict[shKey];
+                        }
+                        else
+                            mdi.Semester = shKey;
+
+                        mdi.StudentID = rec.RefStudentID;
+                        mdi.OccurDate = (rec.OccurDate.Year - 1911) + "/" + rec.OccurDate.Month + "/" + rec.OccurDate.Day;
+                        mdi.Reason = rec.Reason;
+                        if (rec.MeritA.HasValue)
+                            mdi.MA = rec.MeritA.Value;
+
+                        if (rec.MeritB.HasValue)
+                            mdi.MB = rec.MeritB.Value;
+
+                        if (rec.MeritC.HasValue)
+                            mdi.MC = rec.MeritC.Value;
+
+                        mdi.Cleand = rec.Cleared;
+
+                        if (rec.DemeritA.HasValue)
+                            mdi.DA = rec.DemeritA.Value;
+
+                        if (rec.DemeritB.HasValue)
+                            mdi.DB = rec.DemeritB.Value;
+
+                        if (rec.DemeritC.HasValue)
+                            mdi.DC = rec.DemeritC.Value;
+
+                        si.MeritDemeritInfoList.Add(mdi);
+                    }
+
+                }
+
+                // 計算獎懲統計
+                si.CalcMeritDemeritInfoList();
+            }
+
+            return StudentInfoList;
+        }
+
+        public static List<rptStudentInfo> FillRptServiceInfo(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList, DateTime endDate)
+        {
+
+            if (StudentIDList.Count > 0)
+            {
+                endDate = endDate.AddDays(1);
+                string strEndDate = endDate.Year + "-" + endDate.Month + "-" + endDate.Day;
+
+                Dictionary<string, List<rptServiceInfo>> tmpSrvDict = new Dictionary<string, List<rptServiceInfo>>();
+
+                QueryHelper qh = new QueryHelper();
+                string qry = @"
+SELECT 
+    ref_student_id
+    ,occur_date
+    ,internal_or_external
+    ,hours
+    ,reason
+    ,organizers 
+FROM
+ $k12.service.learning.record
+WHERE occur_date < '" + strEndDate + "' AND ref_student_id IN('" + string.Join("','", StudentIDList.ToArray()) + @"')
+ORDER BY ref_student_id,occur_date";
+
+                DataTable dt = qh.Select(qry);
+                if (dt != null)
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        rptServiceInfo sif = new rptServiceInfo();
+                        sif.StudentID = dr["ref_student_id"].ToString();
+                        sif.InternalOrExternal = dr["internal_or_external"].ToString();
+
+                        DateTime ddt;
+                        if (DateTime.TryParse(dr["occur_date"].ToString(), out ddt))
+                        {
+                            sif.OccurDate = (ddt.Year - 1911) + "/" + ddt.Month + "/" + ddt.Day;
+                        }
+
+                        decimal hr;
+                        sif.Hours = 0;
+                        if (decimal.TryParse(dr["hours"].ToString(), out hr))
+                            sif.Hours = hr;
+
+                        sif.Reason = dr["reason"].ToString();
+                        sif.Organizers = dr["organizers"].ToString();
+
+                        if (!tmpSrvDict.ContainsKey(sif.StudentID))
+                            tmpSrvDict.Add(sif.StudentID, new List<rptServiceInfo>());
+
+                        tmpSrvDict[sif.StudentID].Add(sif);
+                    }
+                }
+
+                foreach(rptStudentInfo si in StudentInfoList)
+                {
+                    if (tmpSrvDict.ContainsKey(si.StudentID))
+                    {
+                        si.ServiceInfoList = tmpSrvDict[si.StudentID];
+                        si.CalcServiceInfoList();
+                    }
+                }
+
+            }
+
+            return StudentInfoList;
+        }
 
     }
 }

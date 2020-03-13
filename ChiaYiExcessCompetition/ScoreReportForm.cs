@@ -55,45 +55,24 @@ namespace ChiaYiExcessCompetition
             List<rptStudentInfo> StudentInfoList = QueryData.GetRptStudentInfoListByIDs(StudentIDList);
 
             // 取得學生學期成績
-
-
-            // 轉換並填入學生物件
-
+            StudentInfoList = QueryData.FillRptDomainScoreInfo(StudentIDList, StudentInfoList);
 
             // 取得獎懲紀錄
-
-
-            // 轉換並填入學生物件
-
+            StudentInfoList = QueryData.FillRptMeritDemeritInfo(StudentIDList, StudentInfoList, _Configure.EndDate);
 
             // 取得服務學習紀錄
 
 
-            // 轉換並填入學生物件
-
 
             // 取得體適能紀錄
 
-
-            // 轉換並填入學生物件
-
-
-            // 計算領域成績
-
-
-            // 計算獎懲
-
-
-            // 計算服務學習
-
-
-            // 計算體適能
-
+            Console.Write(1);
 
             // 整理資料，填入 DataTable
 
 
             // debug 
+            dtTable.TableName = "debug";
             dtTable.WriteXml(Application.StartupPath + @"\debug.xml");
 
 
