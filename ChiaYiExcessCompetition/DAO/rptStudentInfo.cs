@@ -11,6 +11,40 @@ namespace ChiaYiExcessCompetition.DAO
     /// </summary>
     public class rptStudentInfo
     {
+        /// <summary>
+        /// 學生系統編號
+        /// </summary>
+        public string StudentID { get; set; }
+
+        /// <summary>
+        /// 學年度
+        /// </summary>
+        public string SchoolYear { get; set; }
+
+        /// <summary>
+        /// 學校名稱
+        /// </summary>
+        public string SchoolName { get; set; }
+
+        /// <summary>
+        /// 班級
+        /// </summary>
+        public string ClassName { get; set; }
+
+        /// <summary>
+        /// 座號
+        /// </summary>
+        public string SeatNo { get; set; }
+
+        /// <summary>
+        /// 姓名
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 性別
+        /// </summary>
+        public string Gender { get; set; }
 
         /// <summary>
         /// 領域成績
@@ -106,7 +140,7 @@ namespace ChiaYiExcessCompetition.DAO
         /// 品德表現_服務學習_校內時數統計
         /// </summary>
         public int ServiceInHourCount = 0;
-             
+
         /// <summary>
         /// 品德表現_體適能_積分
         /// </summary>

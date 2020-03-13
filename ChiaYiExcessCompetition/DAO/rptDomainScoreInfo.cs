@@ -11,5 +11,12 @@ namespace ChiaYiExcessCompetition.DAO
     /// </summary>
     public class rptDomainScoreInfo
     {
+        public string StudentID { get; set; }
+        public string Name { get; set; }
+
+        public Dictionary<string, decimal> ScoreDict = new Dictionary<string, decimal>();
+
+        public decimal AvgScore = 0;
+
     }
 }

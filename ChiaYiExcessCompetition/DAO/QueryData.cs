@@ -474,9 +474,58 @@ GROUP BY ref_student_id
         {
             List<rptStudentInfo> StudentInfoList = new List<rptStudentInfo>();
 
+            if (StudentIDList.Count > 0)
+            {
+                QueryHelper qh = new QueryHelper();
+                string qry = @"
+SELECT 
+student.id AS student_id
+,class.class_name
+,student.seat_no
+,CASE student.gender WHEN '1' THEN '男' WHEN '0' THEN '女' ELSE '' END AS gender
+,student.name AS student_name 
+FROM student LEFT JOIN class 
+ON student.ref_class_id = class.id 
+WHERE student.status = 1 AND student.id IN(" + string.Join(",", StudentIDList.ToArray()) + @")
+ORDER BY class.grade_year DESC,class.display_order,class.class_name,seat_no
+";
+                DataTable dt = qh.Select(qry);
+                if (dt!= null)
+                {
+                    foreach(DataRow dr in dt.Rows)
+                    {
+                        rptStudentInfo si = new rptStudentInfo();
+                        si.StudentID = dr["student_id"].ToString();
+                        si.ClassName = dr["class_name"].ToString();
+                        si.SeatNo = dr["seat_no"].ToString();
+                        si.Gender = dr["gender"].ToString();
+                        si.SchoolYear = K12.Data.School.DefaultSchoolYear;
+                        si.SchoolName = K12.Data.School.ChineseName;
+                        si.Name = dr["student_name"].ToString();
+
+                        StudentInfoList.Add(si);
+                    }                 
+
+                }
+
+            }
+
             return StudentInfoList;
         }
 
+        public static List<rptStudentInfo> FillRptDomainScoreInfo(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList)
+        {
+            return StudentInfoList;
+        }
+
+        public static List<rptStudentInfo> FillRptFitnessInfo(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList)
+        {
+            return StudentInfoList;
+        }
+
+        public static List<rptStudentInfo> FillRptMeritDemeritInfo(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList, DateTime endDate) { return StudentInfoList; }
+
+        public static List<rptStudentInfo> FillRptServiceInfo(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList, DateTime endDate) { return StudentInfoList; }
 
     }
 }

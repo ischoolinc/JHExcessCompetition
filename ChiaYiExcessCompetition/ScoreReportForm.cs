@@ -51,14 +51,50 @@ namespace ChiaYiExcessCompetition
             bgWorkerReport.ReportProgress(1);
 
             // 讀取資料
+            // 取得所選學生資料
+            List<rptStudentInfo> StudentInfoList = QueryData.GetRptStudentInfoListByIDs(StudentIDList);
+
+            // 取得學生學期成績
 
 
+            // 轉換並填入學生物件
 
 
-            // 整理資料
-            List<rptStudentInfo> StudentInfoList = new List<rptStudentInfo>();
+            // 取得獎懲紀錄
 
 
+            // 轉換並填入學生物件
+
+
+            // 取得服務學習紀錄
+
+
+            // 轉換並填入學生物件
+
+
+            // 取得體適能紀錄
+
+
+            // 轉換並填入學生物件
+
+
+            // 計算領域成績
+
+
+            // 計算獎懲
+
+
+            // 計算服務學習
+
+
+            // 計算體適能
+
+
+            // 整理資料，填入 DataTable
+
+
+            // debug 
+            dtTable.WriteXml(Application.StartupPath + @"\debug.xml");
 
 
 
@@ -74,7 +110,6 @@ namespace ChiaYiExcessCompetition
             #region 產生合併欄位
 
             dtTable.Columns.Add("學年度");
-            dtTable.Columns.Add("學校所在地");
             dtTable.Columns.Add("學校名稱");
             dtTable.Columns.Add("班級");
             dtTable.Columns.Add("座號");
@@ -334,6 +369,7 @@ namespace ChiaYiExcessCompetition
         {
             this.MinimumSize = this.MaximumSize = this.Size;
             LoadTemplate();
+            this.Text = "成績冊(資料統計至" + _Configure.EndDate.Year + "年" + _Configure.EndDate.Month + "月" + _Configure.EndDate.Day + "日)";
         }
 
         private void LoadTemplate()
@@ -346,12 +382,17 @@ namespace ChiaYiExcessCompetition
                 {
                     _Configure = confList[0];
                     _Configure.Decode();
+                    if (_Configure.EndDate.Date.Year < DateTime.Now.Year)
+                        _Configure.EndDate = new DateTime(DateTime.Now.Year, 4, 30);
                 }
                 else
                 {
                     _Configure = new Configure();
                     _Configure.Name = "嘉義免試入學-成績冊";
                     _Configure.Template = new Document(new MemoryStream(Properties.Resources.嘉義區成績冊樣板));
+                    if (_Configure.EndDate.Date.Year < DateTime.Now.Year)
+                        _Configure.EndDate = new DateTime(DateTime.Now.Year, 4, 30);
+
                     _Configure.Encode();
 
                 }
