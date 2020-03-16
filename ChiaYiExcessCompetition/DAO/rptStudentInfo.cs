@@ -46,6 +46,14 @@ namespace ChiaYiExcessCompetition.DAO
         /// </summary>
         public string Gender { get; set; }
 
+        public DateTime Birthday { get; set; }
+
+        /// <summary>
+        /// 是低收入戶
+        /// </summary>
+        public bool IncomeType1 = false;
+
+
         /// <summary>
         /// 學習歷程
         /// </summary>
@@ -139,6 +147,26 @@ namespace ChiaYiExcessCompetition.DAO
         /// </summary>
         public int FitnessIScore = 0;
 
+
+        /// <summary>
+        /// 體適能是否加分
+        /// </summary>
+        public bool isAddFitnessScore = false;
+
+        /// <summary>
+        /// 是否身心手冊
+        /// </summary>
+        public bool isSpecial = false;
+
+        /// <summary>
+        /// 體適能用
+        /// </summary>
+        public List<string> sit_and_reach_degreeList = new List<string>();
+        public List<string> standing_long_jump_degreeList = new List<string>();
+        public List<string> sit_up_degreeList = new List<string>();
+        public List<string> cardiorespiratory_degreeList = new List<string>();
+
+
         public void CalcDomainScoreInfoList()
         {
             foreach (string dname in DomainScoreInfoDict.Keys)
@@ -211,7 +239,77 @@ namespace ChiaYiExcessCompetition.DAO
 
         }
 
-        public void CalcFitnessInfoList() { }
+        public void CalcFitnessInfoList()
+        {
+            int score = 0;
+
+            // 嘉義版最高9分，每項獲得中等，給3分，最高9分，四項都有銅牌以上加1分
+
+            // 符合達標字串
+            List<string> passStringList = new List<string>();
+            passStringList.Add("金牌");
+            passStringList.Add("銀牌");
+            passStringList.Add("銅牌");
+            passStringList.Add("中等");
+            passStringList.Add("免測");
+
+
+            if (isSpecial)
+            {// 有身心手冊 9分
+                FitnessIScore = 9;
+            }
+            else
+            {
+                FitnessIScore = 0;
+
+                // 檢查四項資料
+                foreach (string name in passStringList)
+                {
+                    if (sit_and_reach_degreeList.Contains(name))
+                    {
+                        score += 3;
+                        break;
+                    }
+                }
+
+                foreach (string name in passStringList)
+                {
+                    if (standing_long_jump_degreeList.Contains(name))
+                    {
+                        score += 3;
+                        break;
+                    }
+                }
+
+                foreach (string name in passStringList)
+                {
+                    if (sit_up_degreeList.Contains(name))
+                    {
+                        score += 3;
+                        break;
+                    }
+                }
+
+                foreach (string name in passStringList)
+                {
+                    if (cardiorespiratory_degreeList.Contains(name))
+                    {
+                        score += 3;
+                        break;
+                    }
+                }
+
+                if (score > 9)
+                    score = 9;
+
+                // 檢查每次是否都有銅牌
+                if (isAddFitnessScore)
+                    score += 1;
+
+                FitnessIScore = score;
+
+            }
+        }
 
         public void CalcServiceInfoList()
         {
@@ -238,6 +336,37 @@ namespace ChiaYiExcessCompetition.DAO
             if (ServiceIScore > 8)
                 ServiceIScore = 8;
         }
+
+        /// <summary>
+        /// 傳入日期與生日比對回傳年齡整數
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        public int GetAge(DateTime dt)
+        {
+            int age = 0;
+
+            if (dt != null && Birthday != null)
+            {
+                if (dt.Year > 1911 && Birthday.Year > 1911)
+                {
+                    // 年齡
+                    int y = dt.Year - Birthday.Year;
+
+                    // 檢查是否滿
+                    DateTime chkDt = new DateTime(dt.Year, Birthday.Month, Birthday.Day);
+
+                    // 如果檢查日大於傳入日期，表示滿，否:-1歲
+                    if (chkDt > dt)
+                        age = y;
+                    else
+                        age = y - 1;
+                }
+            }
+
+            return age;
+        }
+
 
     }
 }

@@ -485,7 +485,8 @@ SELECT
         ,student.seat_no
         ,CASE student.gender WHEN '1' THEN '男' WHEN '0' THEN '女' ELSE '' END AS gender
         ,student.name AS student_name
-        ,sems_history 
+        ,sems_history
+        ,birthdate 
 FROM student LEFT JOIN class 
 ON student.ref_class_id = class.id 
 WHERE student.status = 1 AND student.id IN(" + string.Join(",", StudentIDList.ToArray()) + @")
@@ -504,6 +505,13 @@ ORDER BY class.grade_year DESC,class.display_order,class.class_name,seat_no
                         si.SchoolYear = K12.Data.School.DefaultSchoolYear;
                         si.SchoolName = K12.Data.School.ChineseName;
                         si.Name = dr["student_name"].ToString();
+
+                        DateTime dt1;
+
+                        if (DateTime.TryParse(dr["birthdate"].ToString(), out dt1))
+                        {
+                            si.Birthday = dt1;
+                        }
 
                         // 處理學期歷程
                         if (dr["sems_history"] != null)
@@ -575,7 +583,7 @@ ORDER BY class.grade_year DESC,class.display_order,class.class_name,seat_no
         }
 
         /// <summary>
-        /// 取得領域資料並填入
+        /// 取得領域資料並填入成績冊用
         /// </summary>
         /// <param name="StudentIDList"></param>
         /// <param name="StudentInfoList"></param>
@@ -644,11 +652,162 @@ ORDER BY class.grade_year DESC,class.display_order,class.class_name,seat_no
             return StudentInfoList;
         }
 
+        /// <summary>
+        /// 成績冊用體適能
+        /// </summary>
+        /// <param name="StudentIDList"></param>
+        /// <param name="StudentInfoList"></param>
+        /// <returns></returns>
         public static List<rptStudentInfo> FillRptFitnessInfo(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList)
         {
+            if (StudentIDList.Count > 0)
+            {
+                Dictionary<string, List<rptFitnessInfo>> tmpFitDict = new Dictionary<string, List<rptFitnessInfo>>();
+
+                try
+                {
+                    QueryHelper qh = new QueryHelper();
+                    string qry = @"
+SELECT 
+    ref_student_id AS student_id
+    ,test_date
+    ,sit_and_reach
+    ,sit_and_reach_degree
+    ,standing_long_jump
+    ,standing_long_jump_degree
+    ,sit_up
+    ,sit_up_degree
+    ,cardiorespiratory
+    ,cardiorespiratory_degree
+FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", StudentIDList.ToArray()) + @"') 
+ORDER BY test_date";
+                    DataTable dt = qh.Select(qry);
+                    if (dt != null)
+                    {
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            string sid = dr["student_id"].ToString();
+
+                            if (!tmpFitDict.ContainsKey(sid))
+                                tmpFitDict.Add(sid, new List<rptFitnessInfo>());
+
+                            rptFitnessInfo fi = new rptFitnessInfo();
+                            fi.StudentID = sid;
+
+                            DateTime dt1;
+
+                            if (DateTime.TryParse(dr["test_date"].ToString(), out dt1))
+                            {
+                                fi.TestDate = dt1;
+                                fi.TestDateStr = (fi.TestDate.Year - 1911) + "/" + fi.TestDate.Month + "/" + fi.TestDate.Day;
+                            }
+
+                            fi.Sit_and_reach = dr["sit_and_reach"].ToString();
+                            fi.Sit_and_reach_degree = dr["sit_and_reach_degree"].ToString();
+                            fi.Standing_long_jump = dr["standing_long_jump"].ToString();
+                            fi.Standing_long_jump_degree = dr["standing_long_jump_degree"].ToString();
+                            fi.Sit_up = dr["sit_up"].ToString();
+                            fi.Sit_up_degree = dr["sit_up_degree"].ToString();
+                            fi.Cardiorespiratory = dr["cardiorespiratory"].ToString();
+                            fi.Cardiorespiratory_degree = dr["cardiorespiratory_degree"].ToString();
+
+                            tmpFitDict[sid].Add(fi);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+                List<string> addStringList = new List<string>();
+                addStringList.Add("金牌");
+                addStringList.Add("銀牌");
+                addStringList.Add("銅牌");
+
+                // 填入學生體適能並年齡轉換
+                foreach (rptStudentInfo si in StudentInfoList)
+                {
+                    if (tmpFitDict.ContainsKey(si.StudentID))
+                    {
+                        si.FitnessInfoList = tmpFitDict[si.StudentID];
+
+                        // 轉換年齡,整理積分需要
+                        foreach (rptFitnessInfo fi in si.FitnessInfoList)
+                        {
+                            fi.Age = si.GetAge(fi.TestDate);
+
+                            int addCount = 0;
+
+                            // sit_and_reach_degree
+                            if (fi.Sit_and_reach_degree == "" || fi.Sit_and_reach_degree == "未檢測")
+                            {
+
+                            }
+                            else
+                            {
+                                si.sit_and_reach_degreeList.Add(fi.Sit_and_reach_degree);
+                                if (addStringList.Contains(fi.Sit_and_reach_degree))
+                                    addCount++;
+                            }
+
+                            // standing_long_jump_degree
+                            if (fi.Standing_long_jump_degree == "" || fi.Standing_long_jump_degree == "未檢測")
+                            {
+
+                            }
+                            else
+                            {
+                                si.standing_long_jump_degreeList.Add(fi.Standing_long_jump_degree);
+                                if (addStringList.Contains(fi.Standing_long_jump_degree))
+                                    addCount++;
+                            }
+
+
+                            // sit_up_degree
+                            if (fi.Sit_up_degree == "" || fi.Sit_up_degree == "未檢測")
+                            {
+
+                            }
+                            else
+                            {
+                                si.sit_up_degreeList.Add(fi.Sit_up_degree);
+                                if (addStringList.Contains(fi.Sit_up_degree))
+                                    addCount++;
+                            }
+
+                            // cardiorespiratory_degree
+                            if (fi.Cardiorespiratory_degree == "" || fi.Cardiorespiratory_degree == "未檢測")
+                            {
+
+                            }
+                            else
+                            {
+                                si.cardiorespiratory_degreeList.Add(fi.Cardiorespiratory_degree);
+                                if (addStringList.Contains(fi.Cardiorespiratory_degree))
+                                    addCount++;
+                            }
+
+                            // 4 次都符合銅牌以上，符合加分
+                            if (addCount == 4)
+                                si.isAddFitnessScore = true;
+                        }
+                    }
+
+                    si.CalcFitnessInfoList();
+                }
+
+            }
             return StudentInfoList;
         }
 
+        /// <summary>
+        /// 成績冊用獎懲
+        /// </summary>
+        /// <param name="StudentIDList"></param>
+        /// <param name="StudentInfoList"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
         public static List<rptStudentInfo> FillRptMeritDemeritInfo(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList, DateTime endDate)
         {
             List<JHDisciplineRecord> tmpRecordList = JHDiscipline.SelectByStudentIDs(StudentIDList);
@@ -724,6 +883,14 @@ ORDER BY class.grade_year DESC,class.display_order,class.class_name,seat_no
             return StudentInfoList;
         }
 
+
+        /// <summary>
+        /// 成績冊用服務學習
+        /// </summary>
+        /// <param name="StudentIDList"></param>
+        /// <param name="StudentInfoList"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
         public static List<rptStudentInfo> FillRptServiceInfo(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList, DateTime endDate)
         {
 
@@ -778,7 +945,7 @@ ORDER BY ref_student_id,occur_date";
                     }
                 }
 
-                foreach(rptStudentInfo si in StudentInfoList)
+                foreach (rptStudentInfo si in StudentInfoList)
                 {
                     if (tmpSrvDict.ContainsKey(si.StudentID))
                     {
@@ -791,6 +958,62 @@ ORDER BY ref_student_id,occur_date";
 
             return StudentInfoList;
         }
+
+        /// <summary>
+        /// 成績冊使用 低收入戶
+        /// </summary>
+        /// <param name="StudentIDList"></param>
+        /// <param name="StudentInfoList"></param>
+        /// <returns></returns>
+        public static List<rptStudentInfo> FillrptIncomeType(List<string> StudentIDList, List<rptStudentInfo> StudentInfoList)
+        {
+            try
+            {
+                // 取得低收入資料
+                QueryHelper qh = new QueryHelper();
+
+                Dictionary<string, DataRow> compDict = new Dictionary<string, DataRow>();
+                string qry = @"
+SELECT ref_student_id AS student_id
+,income_type 
+FROM student_info_ext WHERE ref_student_id IN(" + string.Join(",", StudentIDList.ToArray()) + @")
+
+";
+                DataTable dt = qh.Select(qry);
+                if (dt != null)
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        string sid = dr["student_id"].ToString();
+                        if (!compDict.ContainsKey(sid))
+                            compDict.Add(sid, dr);
+                    }
+                }
+
+                // 填入資料
+                foreach (rptStudentInfo si in StudentInfoList)
+                {
+                    si.IncomeType1 = false;
+                    if (compDict.ContainsKey(si.StudentID))
+                    {
+                        if (compDict[si.StudentID]["income_type"] != null)
+                        {
+                            if (compDict[si.StudentID]["income_type"].ToString() == "低")
+                                si.IncomeType1 = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // throw ex;
+            }
+
+            return StudentInfoList;
+        }
+
+
+
 
     }
 }

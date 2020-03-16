@@ -16,7 +16,12 @@ namespace ChiaYiExcessCompetition.DAO
         /// <summary>
         /// 品德表現_體適能_檢測日期
         /// </summary>
-        public string TestDate { get; set; }
+        public string TestDateStr { get; set; }
+
+        /// <summary>
+        /// 測驗日期，計算年齡使用
+        /// </summary>
+        public DateTime TestDate { get; set; }
 
         /// <summary>
         /// 品德表現_體適能_年齡
