@@ -861,7 +861,7 @@ ORDER BY test_date";
                             mdi.MC = rec.MeritC.Value;
 
                         mdi.Cleand = rec.Cleared;
-
+                        
                         if (rec.DemeritA.HasValue)
                             mdi.DA = rec.DemeritA.Value;
 

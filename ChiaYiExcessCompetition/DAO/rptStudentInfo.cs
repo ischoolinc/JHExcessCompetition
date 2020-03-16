@@ -166,6 +166,24 @@ namespace ChiaYiExcessCompetition.DAO
         public List<string> sit_up_degreeList = new List<string>();
         public List<string> cardiorespiratory_degreeList = new List<string>();
 
+        /// <summary>
+        /// 取得學期領域成績
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="sems"></param>
+        /// <returns></returns>
+        public string GetDomainSemsScore(string name, string sems)
+        {
+            string value = "";
+            if (DomainScoreInfoDict.ContainsKey(name))
+            {
+                if (DomainScoreInfoDict[name].ScoreDict.ContainsKey(sems))
+                {
+                    value = DomainScoreInfoDict[name].ScoreDict[sems].ToString();
+                }
+            }
+            return value;
+        }
 
         public void CalcDomainScoreInfoList()
         {

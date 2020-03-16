@@ -28,6 +28,8 @@ namespace ChiaYiExcessCompetition
         List<string> StudentIDList = new List<string>();
 
         Dictionary<string, Document> StudentDocDict = new Dictionary<string, Document>();
+        Dictionary<string, string> StudentDocNameDict = new Dictionary<string, string>();
+
 
         public ScoreReportForm()
         {
@@ -48,8 +50,72 @@ namespace ChiaYiExcessCompetition
             FISCA.Presentation.MotherForm.SetStatusBarMessage("");
 
 
+            string path = Path.Combine(System.Windows.Forms.Application.StartupPath, "Reports\\嘉義免試入學成績冊");
+            string p1 = path;
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
 
+            foreach (string sid in StudentDocDict.Keys)
+            {
+                try
+                {
+                    Document document = StudentDocDict[sid];
 
+                    #region 儲存檔案
+                    string reportName = "嘉義免試入學-成績冊" + StudentDocNameDict[sid];
+
+                    path = Path.Combine(path, reportName + ".doc");
+
+                    if (File.Exists(path))
+                    {
+                        int i = 1;
+                        while (true)
+                        {
+                            string newPath = Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + (i++) + Path.GetExtension(path);
+                            if (!File.Exists(newPath))
+                            {
+                                path = newPath;
+                                break;
+                            }
+                        }
+                    }
+
+                    try
+                    {
+                       
+                        document.Save(path, SaveFormat.Doc);
+
+                    }
+                    catch
+                    {
+                        System.Windows.Forms.SaveFileDialog sd = new System.Windows.Forms.SaveFileDialog();
+                        sd.Title = "另存新檔";
+                        sd.FileName = reportName + ".doc";
+                        sd.Filter = "Word檔案 (*.doc)|*.doc|所有檔案 (*.*)|*.*";
+                        if (sd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        {
+                            try
+                            {
+                                document.Save(sd.FileName, Aspose.Words.SaveFormat.Doc);
+
+                            }
+                            catch
+                            {
+                                FISCA.Presentation.Controls.MsgBox.Show("指定路徑無法存取。", "建立檔案失敗", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                return;
+                            }
+                        }
+                    }
+                    #endregion
+
+                }
+                catch (Exception ex)
+                {
+                    FISCA.Presentation.Controls.MsgBox.Show("產生過程發生錯誤," + ex.Message);
+                }
+            }
+
+            System.Diagnostics.Process.Start(p1);
         }
 
         private void BgWorkerReport_DoWork(object sender, DoWorkEventArgs e)
@@ -148,10 +214,18 @@ namespace ChiaYiExcessCompetition
 
             // 取得低收入並填入
             StudentInfoList = QueryData.FillrptIncomeType(StudentIDList, StudentInfoList);
-            
+
             bgWorkerReport.ReportProgress(50);
 
             StudentDocDict.Clear();
+            StudentDocNameDict.Clear();
+
+            List<string> domainNameList = new List<string>();
+            domainNameList.Add("健康與體育");
+            domainNameList.Add("藝術與人文");
+            domainNameList.Add("綜合活動");
+
+
 
             // 整理資料，填入 DataTable
             foreach (rptStudentInfo si in StudentInfoList)
@@ -173,24 +247,17 @@ namespace ChiaYiExcessCompetition
                 dtTable.Columns.Add("姓名");
                 dtTable.Columns.Add("扶助弱勢_身分");
                 dtTable.Columns.Add("扶助弱勢_積分");
-                dtTable.Columns.Add("均衡學習_健康與體育_七上分數");
-                dtTable.Columns.Add("均衡學習_健康與體育_七下分數");
-                dtTable.Columns.Add("均衡學習_健康與體育_八上分數");
-                dtTable.Columns.Add("均衡學習_健康與體育_八下分數");
-                dtTable.Columns.Add("均衡學習_健康與體育_九上分數");
-                dtTable.Columns.Add("均衡學習_健康與體育_平均");
-                dtTable.Columns.Add("均衡學習_藝術與人文_七上分數");
-                dtTable.Columns.Add("均衡學習_藝術與人文_七下分數");
-                dtTable.Columns.Add("均衡學習_藝術與人文_八上分數");
-                dtTable.Columns.Add("均衡學習_藝術與人文_八下分數");
-                dtTable.Columns.Add("均衡學習_藝術與人文_九上分數");
-                dtTable.Columns.Add("均衡學習_藝術與人文_平均");
-                dtTable.Columns.Add("均衡學習_綜合活動_七上分數");
-                dtTable.Columns.Add("均衡學習_綜合活動_七下分數");
-                dtTable.Columns.Add("均衡學習_綜合活動_八上分數");
-                dtTable.Columns.Add("均衡學習_綜合活動_八下分數");
-                dtTable.Columns.Add("均衡學習_綜合活動_九上分數");
-                dtTable.Columns.Add("均衡學習_綜合活動_平均");
+
+                foreach (string name in domainNameList)
+                {
+                    dtTable.Columns.Add("均衡學習_" + name + "_七上分數");
+                    dtTable.Columns.Add("均衡學習_" + name + "_七下分數");
+                    dtTable.Columns.Add("均衡學習_" + name + "_八上分數");
+                    dtTable.Columns.Add("均衡學習_" + name + "_八下分數");
+                    dtTable.Columns.Add("均衡學習_" + name + "_九上分數");
+                    dtTable.Columns.Add("均衡學習_" + name + "_平均");
+                }
+
                 dtTable.Columns.Add("均衡學習_積分");
                 dtTable.Columns.Add("品德表現_獎懲_大功統計");
                 dtTable.Columns.Add("品德表現_獎懲_小功統計");
@@ -274,24 +341,20 @@ namespace ChiaYiExcessCompetition
                     row["扶助弱勢_積分"] = 0;
                 }
 
-                row["均衡學習_健康與體育_七上分數"] = "";
-                row["均衡學習_健康與體育_七下分數"] = "";
-                row["均衡學習_健康與體育_八上分數"] = "";
-                row["均衡學習_健康與體育_八下分數"] = "";
-                row["均衡學習_健康與體育_九上分數"] = "";
-                row["均衡學習_健康與體育_平均"] = "";
-                row["均衡學習_藝術與人文_七上分數"] = "";
-                row["均衡學習_藝術與人文_七下分數"] = "";
-                row["均衡學習_藝術與人文_八上分數"] = "";
-                row["均衡學習_藝術與人文_八下分數"] = "";
-                row["均衡學習_藝術與人文_九上分數"] = "";
-                row["均衡學習_藝術與人文_平均"] = "";
-                row["均衡學習_綜合活動_七上分數"] = "";
-                row["均衡學習_綜合活動_七下分數"] = "";
-                row["均衡學習_綜合活動_八上分數"] = "";
-                row["均衡學習_綜合活動_八下分數"] = "";
-                row["均衡學習_綜合活動_九上分數"] = "";
-                row["均衡學習_綜合活動_平均"] = "";
+                // 處理領域學期成績
+                foreach (string name in domainNameList)
+                {
+                    if (si.DomainScoreInfoDict.ContainsKey(name))
+                    {
+                        row["均衡學習_" + name + "_七上分數"] = si.GetDomainSemsScore(name, "七上");
+                        row["均衡學習_" + name + "_七下分數"] = si.GetDomainSemsScore(name, "七下");
+                        row["均衡學習_" + name + "_八上分數"] = si.GetDomainSemsScore(name, "八上");
+                        row["均衡學習_" + name + "_八下分數"] = si.GetDomainSemsScore(name, "八下");
+                        row["均衡學習_" + name + "_九上分數"] = si.GetDomainSemsScore(name, "九上");
+                        row["均衡學習_" + name + "_平均"] = si.DomainScoreInfoDict[name].AvgScore;
+                    }
+                }
+
                 row["均衡學習_積分"] = si.DomainIScore;
 
 
@@ -311,7 +374,58 @@ namespace ChiaYiExcessCompetition
 
                 row["品德表現_體適能_積分"] = si.FitnessIScore;
 
+                int idx = 1;
+                // 處理獎懲明細
+                foreach (rptMeritDemeritInfo md in si.MeritDemeritInfoList)
+                {
+                    row["品德表現_獎懲_獎懲日期" + idx] = md.OccurDate;
+                    row["品德表現_獎懲_學期" + idx] = md.Semester;
+                    row["品德表現_獎懲_獎懲事由" + idx] = md.Reason;
+                    row["品德表現_獎懲_大功" + idx] = md.MA;
+                    row["品德表現_獎懲_小功" + idx] = md.MB;
+                    row["品德表現_獎懲_嘉獎" + idx] = md.MC;
+                    row["品德表現_獎懲_大過" + idx] = md.DA;
+                    row["品德表現_獎懲_小過" + idx] = md.DB;
+                    row["品德表現_獎懲_警告" + idx] = md.DC;
 
+                    if (md.Cleand == "是")
+                        row["品德表現_獎懲_銷過" + idx] = "是";
+                    else
+                        row["品德表現_獎懲_銷過" + idx] = "--";
+
+                    idx++;
+                }
+
+                idx = 1;
+                // 處理服務學習
+                foreach (rptServiceInfo sif in si.ServiceInfoList)
+                {
+                    row["品德表現_服務學習_資料輸入日期" + idx] = sif.OccurDate;
+                    row["品德表現_服務學習_校內外" + idx] = sif.InternalOrExternal;
+                    row["品德表現_服務學習_服務時數" + idx] = sif.Hours;
+                    row["品德表現_服務學習_服務學習活動內容" + idx] = sif.Reason;
+                    row["品德表現_服務學習_服務學習證明單位" + idx] = sif.Organizers;
+                    idx++;
+                }
+
+                idx = 1;
+                // 體適能
+                foreach (rptFitnessInfo fi in si.FitnessInfoList)
+                {
+                    row["品德表現_體適能_檢測日期" + idx] = fi.TestDateStr;
+                    row["品德表現_體適能_年齡" + idx] = fi.Age;
+                    row["品德表現_體適能_性別" + idx] = si.Gender;
+                    row["品德表現_體適能_坐姿體前彎_成績" + idx] = fi.Sit_and_reach;
+                    row["品德表現_體適能_立定跳遠_成績" + idx] = fi.Standing_long_jump;
+                    row["品德表現_體適能_仰臥起坐_成績" + idx] = fi.Sit_up;
+                    row["品德表現_體適能_公尺跑走_成績" + idx] = fi.Cardiorespiratory;
+                    row["品德表現_體適能_坐姿體前彎_等級" + idx] = fi.Sit_and_reach_degree;
+                    row["品德表現_體適能_立定跳遠_等級" + idx] = fi.Standing_long_jump_degree;
+                    row["品德表現_體適能_仰臥起坐_等級" + idx] = fi.Sit_up_degree;
+                    row["品德表現_體適能_公尺跑走_等級" + idx] = fi.Cardiorespiratory_degree;
+
+                    idx++;
+                }
 
 
                 dtTable.Rows.Add(row);
@@ -325,7 +439,11 @@ namespace ChiaYiExcessCompetition
                 docTemplate.MailMerge.DeleteFields();
 
                 if (!StudentDocDict.ContainsKey(si.StudentID))
+                {
                     StudentDocDict.Add(si.StudentID, docTemplate);
+                    StudentDocNameDict.Add(si.StudentID, si.ClassName + "班" + si.SeatNo + "號");
+                }
+
 
             }
 
