@@ -50,10 +50,9 @@ namespace ChiaYiExcessCompetition
             FISCA.Presentation.MotherForm.SetStatusBarMessage("");
 
 
-            string path = Path.Combine(System.Windows.Forms.Application.StartupPath, "Reports\\嘉義免試入學成績冊");
-            string p1 = path;
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            string path = "";
+            // 完成後開啟資料夾
+            string p1 = "";
 
             foreach (string sid in StudentDocDict.Keys)
             {
@@ -63,6 +62,11 @@ namespace ChiaYiExcessCompetition
 
                     #region 儲存檔案
                     string reportName = "嘉義免試入學-成績冊" + StudentDocNameDict[sid];
+                    path = Path.Combine(System.Windows.Forms.Application.StartupPath, "Reports\\嘉義免試入學成績冊");
+
+                    p1 = path;
+                    if (!Directory.Exists(path))
+                        Directory.CreateDirectory(path);
 
                     path = Path.Combine(path, reportName + ".doc");
 
@@ -82,11 +86,9 @@ namespace ChiaYiExcessCompetition
 
                     try
                     {
-                       
                         document.Save(path, SaveFormat.Doc);
-
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         System.Windows.Forms.SaveFileDialog sd = new System.Windows.Forms.SaveFileDialog();
                         sd.Title = "另存新檔";
@@ -270,6 +272,7 @@ namespace ChiaYiExcessCompetition
                 dtTable.Columns.Add("品德表現_服務學習_積分");
                 dtTable.Columns.Add("品德表現_服務學習_校內時數統計");
                 dtTable.Columns.Add("品德表現_服務學習_校外時數統計");
+                dtTable.Columns.Add("品德表現_服務學習_校內外時數統計");
                 dtTable.Columns.Add("品德表現_體適能_積分");
 
                 for (int i = 1; i <= 100; i++)
@@ -310,13 +313,13 @@ namespace ChiaYiExcessCompetition
                 }
                 #endregion
 
-                StreamWriter sw1 = new StreamWriter(Application.StartupPath + "\\合併欄位.txt");
-                StringBuilder sb1 = new StringBuilder();
-                foreach (DataColumn dc in dtTable.Columns)
-                    sb1.AppendLine(dc.Caption);
+                //StreamWriter sw1 = new StreamWriter(Application.StartupPath + "\\合併欄位.txt");
+                //StringBuilder sb1 = new StringBuilder();
+                //foreach (DataColumn dc in dtTable.Columns)
+                //    sb1.AppendLine(dc.Caption);
 
-                sw1.Write(sb1.ToString());
-                sw1.Close();
+                //sw1.Write(sb1.ToString());
+                //sw1.Close();
 
 
 
@@ -371,7 +374,7 @@ namespace ChiaYiExcessCompetition
                 row["品德表現_服務學習_積分"] = si.ServiceIScore;
                 row["品德表現_服務學習_校內時數統計"] = si.ServiceInHourCount;
                 row["品德表現_服務學習_校外時數統計"] = si.ServiceOutHourCount;
-
+                row["品德表現_服務學習_校內外時數統計"] = si.ServiceInHourCount + si.ServiceOutHourCount;
                 row["品德表現_體適能_積分"] = si.FitnessIScore;
 
                 int idx = 1;
@@ -430,9 +433,9 @@ namespace ChiaYiExcessCompetition
 
                 dtTable.Rows.Add(row);
 
-                // debug 
-                dtTable.TableName = "debug";
-                dtTable.WriteXml(Application.StartupPath + @"\debug" + si.StudentID + ".xml");
+                //// debug 
+                //dtTable.TableName = "debug";
+                //dtTable.WriteXml(Application.StartupPath + @"\debug" + si.StudentID + ".xml");
 
                 docTemplate.MailMerge.Execute(dtTable);
                 docTemplate.MailMerge.RemoveEmptyParagraphs = true;
@@ -665,6 +668,7 @@ namespace ChiaYiExcessCompetition
             lnkChangeTemplate.Enabled = value;
             lnkViewMapColumns.Enabled = value;
             lnkViewTemplate.Enabled = value;
+            lnkDefault.Enabled = value;
             btnPrint.Enabled = value;
         }
     }

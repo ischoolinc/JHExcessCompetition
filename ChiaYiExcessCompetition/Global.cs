@@ -165,12 +165,17 @@ namespace ChiaYiExcessCompetition
 
             builder.InsertCell(); builder.Write("品德表現_服務學習校內時數統計");
             builder.InsertCell();
-            builder.InsertField("MERGEFIELD " + "品德表現_服務學習_校內時數統計" + " \\* MERGEFORMAT ", "«" + "品德表現服務學習_校內時數統計" + "»");
+            builder.InsertField("MERGEFIELD " + "品德表現_服務學習_校內時數統計" + " \\* MERGEFORMAT ", "«" + "SC" + "»");
             builder.EndRow();
 
             builder.InsertCell(); builder.Write("品德表現_服務學習校外時數統計");
             builder.InsertCell();
-            builder.InsertField("MERGEFIELD " + "品德表現_服務學習_校外時數統計" + " \\* MERGEFORMAT ", "«" + "品德表現服務學習_校外時數統計" + "»");
+            builder.InsertField("MERGEFIELD " + "品德表現_服務學習_校外時數統計" + " \\* MERGEFORMAT ", "«" + "SC" + "»");
+            builder.EndRow();
+
+            builder.InsertCell(); builder.Write("品德表現_服務學習校內外時數統計");
+            builder.InsertCell();
+            builder.InsertField("MERGEFIELD " + "品德表現_服務學習_校內外時數統計" + " \\* MERGEFORMAT ", "«" + "SC" + "»");
             builder.EndRow();
 
             builder.InsertCell(); builder.Write("品德表現_體適能積分");
@@ -222,11 +227,11 @@ namespace ChiaYiExcessCompetition
 
             for (int i = 1; i <= 30; i++)
             {
-                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "資料輸入日期" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
-                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "校內外" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
-                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "服務時數" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
-                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "服務學習活動內容" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
-                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "服務學習證明單位" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "品德表現_服務學習_資料輸入日期" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "品德表現_服務學習_校內外" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "品德表現_服務學習_服務時數" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "品德表現_服務學習_服務學習活動內容" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "品德表現_服務學習_服務學習證明單位" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
                 builder.EndRow();
             }
             builder.EndTable();
