@@ -342,7 +342,7 @@ namespace ChiaYiExcessCompetition.DAO
 
                 if (sif.InternalOrExternal == "校外")
                 {
-                    ServiceInHourCount += sif.Hours;
+                    ServiceOutHourCount += sif.Hours;
                 }
 
                 sum += sif.Hours;
