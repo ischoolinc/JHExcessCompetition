@@ -27,6 +27,9 @@ namespace ChiaYiExcessCompetition
 
         List<string> StudentIDList = new List<string>();
 
+        List<string> errorMsgList = new List<string>();
+
+
         Dictionary<string, Document> StudentDocDict = new Dictionary<string, Document>();
         Dictionary<string, string> StudentDocNameDict = new Dictionary<string, string>();
 
@@ -48,6 +51,12 @@ namespace ChiaYiExcessCompetition
         private void BgWorkerReport_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             FISCA.Presentation.MotherForm.SetStatusBarMessage("");
+
+            if (errorMsgList.Count > 0)
+            {
+                MsgBox.Show("無法產生檔案，請到 教務作業>資料統計>報表>嘉義免試入學>送審用匯入檔，設定學生身分。");
+                return;
+            }
 
 
             string path = "";
@@ -122,7 +131,7 @@ namespace ChiaYiExcessCompetition
 
         private void BgWorkerReport_DoWork(object sender, DoWorkEventArgs e)
         {
-
+            errorMsgList.Clear();
             bgWorkerReport.ReportProgress(1);
 
             // 讀取資料
@@ -138,54 +147,63 @@ namespace ChiaYiExcessCompetition
             // 取得學生類別
             Dictionary<string, List<string>> StudentTagDict = QueryData.GetStudentTagName(StudentIDList);
 
-            // 解析對照設定
-            XElement elmRoot = XElement.Parse(_Configure.MappingContent);
-            if (elmRoot != null)
+            try
             {
-                foreach (XElement elm in elmRoot.Elements("Group"))
+                // 解析對照設定
+                XElement elmRoot = XElement.Parse(_Configure.MappingContent);
+                if (elmRoot != null)
                 {
-                    string gpName = elm.Attribute("Name").Value;
-                    if (gpName == "學生身分")
+                    foreach (XElement elm in elmRoot.Elements("Group"))
                     {
-                        foreach (XElement elm1 in elm.Elements("Item"))
+                        string gpName = elm.Attribute("Name").Value;
+                        if (gpName == "學生身分")
                         {
-                            string tagName = elm1.Attribute("TagName").Value;
-                            if (!MappingTag1.ContainsKey(tagName) && tagName.Length > 0)
-                                MappingTag1.Add(tagName, elm1.Attribute("Code").Value);
+                            foreach (XElement elm1 in elm.Elements("Item"))
+                            {
+                                string tagName = elm1.Attribute("TagName").Value;
+                                if (!MappingTag1.ContainsKey(tagName) && tagName.Length > 0)
+                                    MappingTag1.Add(tagName, elm1.Attribute("Code").Value);
+                            }
                         }
-                    }
 
-                    if (gpName == "身心障礙")
-                    {
-                        foreach (XElement elm1 in elm.Elements("Item"))
+                        if (gpName == "身心障礙")
                         {
-                            string tagName = elm1.Attribute("TagName").Value;
-                            if (!MappingTag2.ContainsKey(tagName) && tagName.Length > 0)
-                                MappingTag2.Add(tagName, elm1.Attribute("Code").Value);
+                            foreach (XElement elm1 in elm.Elements("Item"))
+                            {
+                                string tagName = elm1.Attribute("TagName").Value;
+                                if (!MappingTag2.ContainsKey(tagName) && tagName.Length > 0)
+                                    MappingTag2.Add(tagName, elm1.Attribute("Code").Value);
+                            }
                         }
-                    }
 
-                    if (gpName == "學生報名身分設定")
-                    {
-                        foreach (XElement elm1 in elm.Elements("Item"))
+                        if (gpName == "學生報名身分設定")
                         {
-                            string tagName = elm1.Attribute("TagName").Value;
-                            if (!MappingTag3.ContainsKey(tagName) && tagName.Length > 0)
-                                MappingTag3.Add(tagName, elm1.Attribute("Code").Value);
+                            foreach (XElement elm1 in elm.Elements("Item"))
+                            {
+                                string tagName = elm1.Attribute("TagName").Value;
+                                if (!MappingTag3.ContainsKey(tagName) && tagName.Length > 0)
+                                    MappingTag3.Add(tagName, elm1.Attribute("Code").Value);
+                            }
                         }
-                    }
 
-                    if (gpName == "失業勞工子女")
-                    {
-                        foreach (XElement elm1 in elm.Elements("Item"))
+                        if (gpName == "失業勞工子女")
                         {
-                            string tagName = elm1.Attribute("TagName").Value;
-                            if (!MappingTag4.ContainsKey(tagName) && tagName.Length > 0)
-                                MappingTag4.Add(tagName, elm1.Attribute("Code").Value);
+                            foreach (XElement elm1 in elm.Elements("Item"))
+                            {
+                                string tagName = elm1.Attribute("TagName").Value;
+                                if (!MappingTag4.ContainsKey(tagName) && tagName.Length > 0)
+                                    MappingTag4.Add(tagName, elm1.Attribute("Code").Value);
+                            }
                         }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                errorMsgList.Add(ex.Message);
+            }
+
+
 
             // 填入身心障礙生，計算體適能會用到
             foreach (rptStudentInfo si in StudentInfoList)
