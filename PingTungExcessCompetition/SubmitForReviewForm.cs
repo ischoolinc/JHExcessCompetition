@@ -295,7 +295,7 @@ namespace PingTungExcessCompetition
                 bgWorkerExport.ReportProgress(70);
 
                 // 幹部限制
-                List<string> CadreName1 = Global.GetCadreName1();
+                List<string> CadreName1 = _Configure.LoadCareNames();
 
                 foreach (StudentInfo si in StudentInfoList)
                 {
@@ -436,7 +436,10 @@ namespace PingTungExcessCompetition
                     if (AddressDict.ContainsKey(si.StudentID))
                     {
 
-                        string zipCode = AddressDict[si.StudentID].MailingZipCode;
+                        string zipCode = "";
+
+                        if (AddressDict[si.StudentID].MailingZipCode != null)
+                            zipCode = AddressDict[si.StudentID].MailingZipCode;
 
                         if (zipCode.Length >= 3)
                             zipCode = zipCode.Substring(0, 3);
@@ -502,7 +505,7 @@ namespace PingTungExcessCompetition
                     // 計算並填入
                     si.CalcFitnessScore();
                     wst.Cells[wstRIdx, 34].PutValue(si.FitnessScore);
-
+            
                     // 本土語言認證 35
                     if (hasLanguageCertificateIDList.Contains(si.StudentID))
                     {

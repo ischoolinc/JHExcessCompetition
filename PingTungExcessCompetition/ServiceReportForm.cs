@@ -22,7 +22,6 @@ namespace PingTungExcessCompetition
 
         BackgroundWorker bgWorkerReport = new BackgroundWorker();
 
-
         List<string> ClassIDList = new List<string>();
 
         AccessHelper _accessHelper = new AccessHelper();
@@ -136,7 +135,7 @@ namespace PingTungExcessCompetition
             dtTable.Columns.Add("班級名稱");
             dtTable.Columns.Add("學年度");
 
-            for (int studIdx = 1; studIdx <= 50; studIdx++)
+            for (int studIdx = 1; studIdx <= 100; studIdx++)
             {
                 dtTable.Columns.Add("座號" + studIdx);
                 dtTable.Columns.Add("姓名" + studIdx);
@@ -232,7 +231,7 @@ namespace PingTungExcessCompetition
                     _Configure.Name = "屏東免試入學-班級服務表現";
                     _Configure.Template = new Document(new MemoryStream(Properties.Resources.屏東班級服務表現樣板));
                     _Configure.Encode();
-                   
+
                 }
                 _Configure.Save();
                 UserControlEnable(true);
@@ -255,6 +254,7 @@ namespace PingTungExcessCompetition
             lnkChangeTemplate.Enabled = value;
             lnkViewMapColumns.Enabled = value;
             lnkViewTemplate.Enabled = value;
+            btnSetCadreName.Enabled = value;
             btnPrint.Enabled = value;
         }
 
@@ -368,7 +368,7 @@ namespace PingTungExcessCompetition
 
         private void lnkDefault_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-          
+
             lnkDefault.Enabled = false;
             string reportName = "屏東免試入學-班級服務表現";
 
@@ -408,7 +408,7 @@ namespace PingTungExcessCompetition
                 if (sd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     try
-                    {                        
+                    {
                         DefDoc.Save(path, Aspose.Words.SaveFormat.Doc);
                     }
                     catch
@@ -420,6 +420,18 @@ namespace PingTungExcessCompetition
             }
             lnkDefault.Enabled = true;
 
+        }
+
+        private void btnSetCadreName_Click(object sender, EventArgs e)
+        {
+            btnSetCadreName.Enabled = false;
+
+            setCadreNameForm scnf = new setCadreNameForm();
+            scnf.ShowDialog();
+
+
+
+            btnSetCadreName.Enabled = true;
         }
     }
 }

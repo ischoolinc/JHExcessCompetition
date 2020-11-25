@@ -34,6 +34,7 @@
             this.btnPrint = new DevComponents.DotNetBar.ButtonX();
             this.btnCancel = new DevComponents.DotNetBar.ButtonX();
             this.lnkDefault = new System.Windows.Forms.LinkLabel();
+            this.btnSetCadreName = new DevComponents.DotNetBar.ButtonX();
             this.SuspendLayout();
             // 
             // lnkViewMapColumns
@@ -85,7 +86,7 @@
             this.btnPrint.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
             this.btnPrint.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnPrint.Enabled = false;
-            this.btnPrint.Location = new System.Drawing.Point(425, 40);
+            this.btnPrint.Location = new System.Drawing.Point(253, 89);
             this.btnPrint.Name = "btnPrint";
             this.btnPrint.Size = new System.Drawing.Size(67, 23);
             this.btnPrint.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -99,7 +100,7 @@
             this.btnCancel.BackColor = System.Drawing.Color.Transparent;
             this.btnCancel.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(498, 40);
+            this.btnCancel.Location = new System.Drawing.Point(333, 89);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(67, 23);
             this.btnCancel.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -121,11 +122,28 @@
             this.lnkDefault.Text = "檢視預設樣板";
             this.lnkDefault.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkDefault_LinkClicked);
             // 
+            // btnSetCadreName
+            // 
+            this.btnSetCadreName.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.btnSetCadreName.AutoSize = true;
+            this.btnSetCadreName.BackColor = System.Drawing.Color.Transparent;
+            this.btnSetCadreName.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnSetCadreName.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnSetCadreName.Enabled = false;
+            this.btnSetCadreName.Location = new System.Drawing.Point(26, 88);
+            this.btnSetCadreName.Name = "btnSetCadreName";
+            this.btnSetCadreName.Size = new System.Drawing.Size(101, 25);
+            this.btnSetCadreName.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.btnSetCadreName.TabIndex = 6;
+            this.btnSetCadreName.Text = "設定幹部限制";
+            this.btnSetCadreName.Click += new System.EventHandler(this.btnSetCadreName_Click);
+            // 
             // ServiceReportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(577, 86);
+            this.ClientSize = new System.Drawing.Size(417, 121);
+            this.Controls.Add(this.btnSetCadreName);
             this.Controls.Add(this.lnkDefault);
             this.Controls.Add(this.lnkViewMapColumns);
             this.Controls.Add(this.lnkViewTemplate);
@@ -149,5 +167,6 @@
         private DevComponents.DotNetBar.ButtonX btnPrint;
         private DevComponents.DotNetBar.ButtonX btnCancel;
         private System.Windows.Forms.LinkLabel lnkDefault;
+        private DevComponents.DotNetBar.ButtonX btnSetCadreName;
     }
 }

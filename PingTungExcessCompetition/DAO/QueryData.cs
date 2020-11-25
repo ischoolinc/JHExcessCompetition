@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using FISCA.Data;
 using System.Data;
 using System.Xml.Linq;
-
+using FISCA.UDT;
 
 namespace PingTungExcessCompetition.DAO
 {
     public class QueryData
     {
+
         public static Dictionary<string, string> GetClassTeacherNameDictByClassID(List<string> ClassIDList)
         {
             Dictionary<string, string> value = new Dictionary<string, string>();
@@ -168,9 +169,25 @@ SELECT
                     }
                 }
 
+                Configure _Configure = null;
+                AccessHelper _accessHelper = new AccessHelper();
+                List<Configure> confList = _accessHelper.Select<Configure>();
+                if (confList != null && confList.Count > 0)
+                {
+                    _Configure = confList[0];
+
+                }
+                else
+                {
+                    _Configure = new Configure();
+                    _Configure.Name = "屏東免試入學-班級服務表現";
+
+
+                }
+
 
                 // 班級幹部限制
-                List<string> CadreName1 = Global.GetCadreName1();
+                List<string> CadreName1 = _Configure.LoadCareNames();
 
                 // 學生資料取得與整理需要相關資料
                 if (dtStud != null)
@@ -387,16 +404,23 @@ ORDER BY class.grade_year,class.display_order,class.class_name,seat_no
 
                     si.IDNumber = dr["id_number"].ToString().Trim();
 
+                    si.isTaiwanID = false;
+
                     // 檢查是否台灣身分證
-                    string ii = si.IDNumber.Substring(1, 1);
-                    if (ii == "1" || ii == "2")
+                    if (si.IDNumber.Length > 1)
                     {
-                        si.isTaiwanID = true;
+                        string ii = si.IDNumber.Substring(1, 1);
+                        if (ii == "1" || ii == "2")
+                        {
+                            si.isTaiwanID = true;
+                        }
+                        else
+                        {
+                            si.isTaiwanID = false;
+                        }
                     }
-                    else
-                    {
-                        si.isTaiwanID = false;
-                    }
+
+
 
                     si.GenderCode = dr["gender"].ToString();
                     DateTime dt1;

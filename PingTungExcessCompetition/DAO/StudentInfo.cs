@@ -518,25 +518,26 @@ namespace PingTungExcessCompetition.DAO
                 SumRecD += c1;
             }
 
-            //foreach (JHMeritRecord rec in recM)
-            //{
-            //    int b1 = 0, c1 = 0; ;
-            //    if (rec.MeritA.HasValue)
-            //        b1 = ma * rec.MeritA.Value;
-            //    if (rec.MeritB.HasValue)
-            //    {
-            //        b1 += rec.MeritB.Value;
-            //    }
+            foreach (JHMeritRecord rec in recM)
+            {
+                int b1 = 0, c1 = 0; ;
+                if (rec.MeritA.HasValue)
+                    b1 = ma * rec.MeritA.Value;
+                if (rec.MeritB.HasValue)
+                {
+                    b1 += rec.MeritB.Value;
+                }
 
-            //    if (rec.MeritC.HasValue)
-            //        c1 = rec.MeritC.Value;
+                if (rec.MeritC.HasValue)        
+                    c1 = rec.MeritC.Value;
 
-            //    c1 += b1 * mb;   // 都換成獎勵
-            //    SumRecM += c1;
-            //}
+                c1 += b1 * mb;   // 都換成獎勵
+                SumRecM += c1;
+            }
 
             // 功過相抵 (//使用這提到不功過相抵)  sum = SumRecD - SumRecM;
-            int sum = SumRecD;
+            int sum = SumRecD - SumRecM;
+            //  int sum = SumRecD;
 
             if (sum < 1)
                 MeritDemeritScore = 10;
@@ -544,6 +545,8 @@ namespace PingTungExcessCompetition.DAO
                 MeritDemeritScore = 7;
             else if (sum < (db * 2))
                 MeritDemeritScore = 4;
+            else if (sum < (db * 3))
+                MeritDemeritScore = 1;
             else
                 MeritDemeritScore = 0;
         }

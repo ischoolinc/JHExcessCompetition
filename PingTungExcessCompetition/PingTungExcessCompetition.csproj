@@ -132,6 +132,12 @@
     <Compile Include="ServiceReportForm.Designer.cs">
       <DependentUpon>ServiceReportForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="setCadreNameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="setCadreNameForm.Designer.cs">
+      <DependentUpon>setCadreNameForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SubmitForReviewForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -176,6 +182,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ServiceReportForm.resx">
       <DependentUpon>ServiceReportForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="setCadreNameForm.resx">
+      <DependentUpon>setCadreNameForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SubmitForReviewForm.resx">
       <DependentUpon>SubmitForReviewForm.cs</DependentUpon>
