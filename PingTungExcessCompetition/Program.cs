@@ -58,6 +58,21 @@ namespace PingTungExcessCompetition
 
             #endregion
 
+            #region 設定幹部限制
+            RibbonBarItem rbItem3 = MotherForm.RibbonBarItems["教務作業", "資料統計"];
+            rbItem2["報表"]["屏東免試入學"]["設定幹部限制"].Enable = UserAcl.Current["8443B0A6-A7B6-478B-9120-63C4F7B6AE14"].Executable;
+            rbItem2["報表"]["屏東免試入學"]["設定幹部限制"].Click += delegate
+            {
+                setCadreNameForm scnf = new setCadreNameForm();
+                scnf.ShowDialog();
+
+            };
+
+            // 屏東免試入學-設定幹部限制
+            Catalog catalog3 = RoleAclSource.Instance["教務作業"]["功能按鈕"];
+            catalog2.Add(new RibbonFeature("8443B0A6-A7B6-478B-9120-63C4F7B6AE14", "屏東免試入學-設定幹部限制"));
+
+            #endregion
 
         }
     }

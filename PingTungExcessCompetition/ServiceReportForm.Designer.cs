@@ -34,7 +34,6 @@
             this.btnPrint = new DevComponents.DotNetBar.ButtonX();
             this.btnCancel = new DevComponents.DotNetBar.ButtonX();
             this.lnkDefault = new System.Windows.Forms.LinkLabel();
-            this.btnSetCadreName = new DevComponents.DotNetBar.ButtonX();
             this.SuspendLayout();
             // 
             // lnkViewMapColumns
@@ -122,28 +121,11 @@
             this.lnkDefault.Text = "檢視預設樣板";
             this.lnkDefault.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkDefault_LinkClicked);
             // 
-            // btnSetCadreName
-            // 
-            this.btnSetCadreName.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
-            this.btnSetCadreName.AutoSize = true;
-            this.btnSetCadreName.BackColor = System.Drawing.Color.Transparent;
-            this.btnSetCadreName.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.btnSetCadreName.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnSetCadreName.Enabled = false;
-            this.btnSetCadreName.Location = new System.Drawing.Point(26, 88);
-            this.btnSetCadreName.Name = "btnSetCadreName";
-            this.btnSetCadreName.Size = new System.Drawing.Size(101, 25);
-            this.btnSetCadreName.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.btnSetCadreName.TabIndex = 6;
-            this.btnSetCadreName.Text = "設定幹部限制";
-            this.btnSetCadreName.Click += new System.EventHandler(this.btnSetCadreName_Click);
-            // 
             // ServiceReportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(417, 121);
-            this.Controls.Add(this.btnSetCadreName);
             this.Controls.Add(this.lnkDefault);
             this.Controls.Add(this.lnkViewMapColumns);
             this.Controls.Add(this.lnkViewTemplate);
@@ -167,6 +149,5 @@
         private DevComponents.DotNetBar.ButtonX btnPrint;
         private DevComponents.DotNetBar.ButtonX btnCancel;
         private System.Windows.Forms.LinkLabel lnkDefault;
-        private DevComponents.DotNetBar.ButtonX btnSetCadreName;
     }
 }

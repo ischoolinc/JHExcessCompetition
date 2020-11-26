@@ -253,8 +253,7 @@ namespace PingTungExcessCompetition
         {
             lnkChangeTemplate.Enabled = value;
             lnkViewMapColumns.Enabled = value;
-            lnkViewTemplate.Enabled = value;
-            btnSetCadreName.Enabled = value;
+            lnkViewTemplate.Enabled = value;          
             btnPrint.Enabled = value;
         }
 
@@ -422,16 +421,5 @@ namespace PingTungExcessCompetition
 
         }
 
-        private void btnSetCadreName_Click(object sender, EventArgs e)
-        {
-            btnSetCadreName.Enabled = false;
-
-            setCadreNameForm scnf = new setCadreNameForm();
-            scnf.ShowDialog();
-
-
-
-            btnSetCadreName.Enabled = true;
-        }
     }
 }
