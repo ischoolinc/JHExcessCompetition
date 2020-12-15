@@ -82,15 +82,20 @@ ORDER BY class.grade_year,class.display_order,class.class_name,seat_no
 
                     si.IDNumber = dr["id_number"].ToString().Trim();
 
+
+                    si.isTaiwanID = true;
                     // 檢查是否台灣身分證
-                    string ii = si.IDNumber.Substring(1, 1);
-                    if (ii == "1" || ii == "2")
+                    if (si.IDNumber.Length > 1)
                     {
-                        si.isTaiwanID = true;
-                    }
-                    else
-                    {
-                        si.isTaiwanID = false;
+                        string ii = si.IDNumber.Substring(1, 1);
+                        if (ii == "1" || ii == "2")
+                        {
+                            si.isTaiwanID = true;
+                        }
+                        else
+                        {
+                            si.isTaiwanID = false;
+                        }
                     }
 
                     si.GenderCode = dr["gender"].ToString();
@@ -861,7 +866,7 @@ ORDER BY test_date";
                             mdi.MC = rec.MeritC.Value;
 
                         mdi.Cleand = rec.Cleared;
-                        
+
                         if (rec.DemeritA.HasValue)
                             mdi.DA = rec.DemeritA.Value;
 
@@ -1012,7 +1017,72 @@ FROM student_info_ext WHERE ref_student_id IN(" + string.Join(",", StudentIDList
             return StudentInfoList;
         }
 
+        /// <summary>
+        /// 取得學生競賽總分
+        /// </summary>
+        /// <param name="StudentIDList"></param>
+        /// <returns></returns>
+        public static List<StudentInfo> FillStudentCompetitionPerformanceSum(List<string> StudentIDList, List<StudentInfo> StudInfoList)
+        {
+            Dictionary<string, decimal> value = new Dictionary<string, decimal>();
+            try
+            {
+                if (StudentIDList.Count > 0)
+                {
+                    // 嘉義規定：團體賽積分減半
+                    QueryHelper qh = new QueryHelper();
+                    string SQL = " SELECT " +
+                        "ref_student_id AS student_id " +
+                        ",SUM( " +
+                        " CASE " +
+                        " 		WHEN habitude = '團體賽' THEN bt_integral / 2" +
+                        " 	ELSE " +
+                        " 		bt_integral " +
+                        " 	END " +
+                        " ) AS bt_integral_sum" +
+                        " FROM $competition.performance.student " +
+                        "INNER JOIN " +
+                        "$competition.performance.rank " +
+                        "ON $competition.performance.student.rank_name = $competition.performance.rank.bt_rank" +
+                        " WHERE  $competition.performance.student.ref_student_id IN(" + string.Join(",", StudentIDList.ToArray()) + ") " +
+                        "GROUP BY student_id " +
+                        "ORDER BY student_id";
 
+                    DataTable dt = qh.Select(SQL);
+
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        decimal sum;
+
+                        if (decimal.TryParse(dr["bt_integral_sum"] + "", out sum))
+                        {
+                            string sid = dr["student_id"] + "";
+                            if (!value.ContainsKey(sid))
+                                value.Add(sid, sum);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("嘉義競賽取得積分發生錯誤:" + ex.Message);
+            }
+
+            // 填入資料
+            foreach (StudentInfo stud in StudInfoList)
+            {
+                if (value.ContainsKey(stud.StudentID))
+                {
+                    // 最高 10 分
+                    stud.CompPerfSum = value[stud.StudentID];
+                    if (stud.CompPerfSum > 10)
+                        stud.CompPerfSum = 10;
+                }
+            }
+
+
+            return StudInfoList;
+        }
 
 
     }

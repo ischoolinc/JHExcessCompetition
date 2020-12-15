@@ -130,6 +130,11 @@ namespace ChiaYiExcessCompetition.DAO
         /// </summary>
         public bool isAddFitnessScore = false;
 
+        /// <summary>
+        /// 競賽總積分
+        /// </summary>
+        public decimal? CompPerfSum = null;
+
 
         /// <summary>
         /// 是否低輸入

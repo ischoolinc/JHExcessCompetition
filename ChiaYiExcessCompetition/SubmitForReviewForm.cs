@@ -284,6 +284,9 @@ namespace ChiaYiExcessCompetition
                 // 取得學生體適能資料並填入,嘉義版不卡日期，日期傳入不會限制
                 StudentInfoList = QueryData.FillStudentFitness(StudentIDList, StudentInfoList, _Configure.EndDate);
 
+                // 取得競賽總積分並填入學生資料
+                StudentInfoList = QueryData.FillStudentCompetitionPerformanceSum(StudentIDList, StudentInfoList);
+
                 // 填入 Excel 資料
                 int wstRIdx = 1;
                 bgWorkerExport.ReportProgress(70);
@@ -447,12 +450,15 @@ namespace ChiaYiExcessCompetition
                     if (AddressDict.ContainsKey(si.StudentID))
                     {
 
-                        string zipCode = AddressDict[si.StudentID].MailingZipCode;
+                        if (AddressDict[si.StudentID].MailingZipCode != null)
+                        {
+                            string zipCode = AddressDict[si.StudentID].MailingZipCode;
 
-                        if (zipCode.Length >= 3)
-                            zipCode = zipCode.Substring(0, 3);
+                            if (zipCode.Length >= 3)
+                                zipCode = zipCode.Substring(0, 3);
 
-                        wst.Cells[wstRIdx, 28].PutValue(zipCode);
+                            wst.Cells[wstRIdx, 28].PutValue(zipCode);
+                        }
 
                         // 通訊地址 29
                         wst.Cells[wstRIdx, 29].PutValue(AddressDict[si.StudentID].MailingCounty + AddressDict[si.StudentID].MailingTown + AddressDict[si.StudentID].MailingDistrict + AddressDict[si.StudentID].MailingArea + AddressDict[si.StudentID].MailingDetail);
@@ -508,6 +514,12 @@ namespace ChiaYiExcessCompetition
                     wst.Cells[wstRIdx, 35].PutValue(si.FitnessScore);
 
                     // 競賽表現 36,使用者自行處理
+                    if (si.CompPerfSum.HasValue)
+                    {
+                        wst.Cells[wstRIdx, 36].PutValue(si.CompPerfSum.Value);
+                    }
+              
+
                     // 不處理
                     // 家長意見_高中 37
                     // 家長意見_高職 38
