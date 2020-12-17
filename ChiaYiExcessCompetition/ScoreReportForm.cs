@@ -235,6 +235,10 @@ namespace ChiaYiExcessCompetition
             // 取得低收入並填入
             StudentInfoList = QueryData.FillrptIncomeType(StudentIDList, StudentInfoList);
 
+            // 取得學生競賽資料並填入
+            StudentInfoList = QueryData.FillStudentCompetitionPerformance(StudentIDList, StudentInfoList);
+
+
             bgWorkerReport.ReportProgress(50);
 
             StudentDocDict.Clear();
@@ -245,6 +249,9 @@ namespace ChiaYiExcessCompetition
             domainNameList.Add("藝術與人文");
             domainNameList.Add("綜合活動");
 
+
+            //競賽統計
+            Dictionary<string, int> CompPerformanceCountDict = new Dictionary<string, int>();
 
 
             // 整理資料，填入 DataTable
@@ -330,6 +337,44 @@ namespace ChiaYiExcessCompetition
                     dtTable.Columns.Add("品德表現_體適能_公尺跑走_等級" + i);
                 }
                 #endregion
+
+                // 加入競賽成績合併欄位
+                for (int i = 1; i <= 30; i++)
+                {
+                    dtTable.Columns.Add("競賽成績_競賽層級" + i);
+                    dtTable.Columns.Add("競賽成績_競賽性質" + i);
+                    dtTable.Columns.Add("競賽成績_競賽名稱" + i);
+                    dtTable.Columns.Add("競賽成績_得獎名次" + i);
+                    dtTable.Columns.Add("競賽成績_證書日期" + i);
+                    dtTable.Columns.Add("競賽成績_主辦單位" + i);
+                }
+
+                CompPerformanceCountDict.Clear();
+
+                for (int i = 1; i <= 8; i++)
+                {
+                    dtTable.Columns.Add("競賽成績_縣市個人名次" + i);
+                    dtTable.Columns.Add("競賽成績_縣市團體名次" + i);
+                    dtTable.Columns.Add("競賽成績_全國個人名次" + i);
+                    dtTable.Columns.Add("競賽成績_全國團體名次" + i);
+
+                    CompPerformanceCountDict.Add("競賽成績_縣市個人名次" + i, 0);
+                    CompPerformanceCountDict.Add("競賽成績_縣市團體名次" + i, 0);
+                    CompPerformanceCountDict.Add("競賽成績_全國個人名次" + i, 0);
+                    CompPerformanceCountDict.Add("競賽成績_全國團體名次" + i, 0);
+                }
+
+                dtTable.Columns.Add("競賽成績_縣市個人名次_其他");
+                dtTable.Columns.Add("競賽成績_縣市團體名次_其他");
+                dtTable.Columns.Add("競賽成績_全國個人名次_其他");
+                dtTable.Columns.Add("競賽成績_全國團體名次_其他");
+                CompPerformanceCountDict.Add("競賽成績_縣市個人名次_其他", 0);
+                CompPerformanceCountDict.Add("競賽成績_縣市團體名次_其他", 0);
+                CompPerformanceCountDict.Add("競賽成績_全國個人名次_其他", 0);
+                CompPerformanceCountDict.Add("競賽成績_全國團體名次_其他", 0);
+
+                dtTable.Columns.Add("競賽成績_競賽積分");
+                dtTable.Columns.Add("成績_合計總分");
 
                 //StreamWriter sw1 = new StreamWriter(Application.StartupPath + "\\合併欄位.txt");
                 //StringBuilder sb1 = new StringBuilder();
@@ -448,6 +493,90 @@ namespace ChiaYiExcessCompetition
                     idx++;
                 }
 
+                idx = 1;
+                // 填入競賽基本資料
+                foreach (rptCompPerformanceInfo cpi in si.CompPerformanceInfoList)
+                {
+                    row["競賽成績_競賽層級" + idx] = cpi.reward_level;
+                    row["競賽成績_競賽性質" + idx] = cpi.habitude;
+                    row["競賽成績_競賽名稱" + idx] = cpi.name;
+                    row["競賽成績_得獎名次" + idx] = cpi.rank_name;
+                    row["競賽成績_證書日期" + idx] = cpi.certificate_date;
+                    row["競賽成績_主辦單位" + idx] = cpi.organizer;
+                    idx++;
+                }
+
+                // 掃名次填入細項
+                foreach (rptCompPerformanceInfo cpi in si.CompPerformanceInfoList)
+                {
+                    int n = 0;
+                    int.TryParse(cpi.bt_rank_int, out n);
+
+
+                    if (cpi.reward_level.Contains("國"))
+                    {
+                        // 全國
+                        if (cpi.habitude == "個人賽")
+                        {
+                            if (n >= 1 && n <= 8)
+                            {
+                                CompPerformanceCountDict["競賽成績_全國個人名次" + n]++;
+                            }
+                            else
+                            {
+                                CompPerformanceCountDict["競賽成績_全國個人名次_其他"]++;
+                            }
+                        }
+
+                        if (cpi.habitude == "團體賽")
+                        {
+                            if (n >= 1 && n <= 8)
+                            {
+                                CompPerformanceCountDict["競賽成績_全國團體名次" + n]++;
+                            }
+                            else
+                            {
+                                CompPerformanceCountDict["競賽成績_全國團體名次_其他"]++;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // 市
+                        if (cpi.habitude == "個人賽")
+                        {
+                            if (n >= 1 && n <= 8)
+                            {
+                                CompPerformanceCountDict["競賽成績_縣市個人名次" + n]++;
+                            }
+                            else
+                            {
+                                CompPerformanceCountDict["競賽成績_縣市個人名次_其他"]++;
+                            }
+                        }
+
+                        if (cpi.habitude == "團體賽")
+                        {
+                            if (n >= 1 && n <= 8)
+                            {
+                                CompPerformanceCountDict["競賽成績_縣市團體名次" + n]++;
+                            }
+                            else
+                            {
+                                CompPerformanceCountDict["競賽成績_縣市團體名次_其他"]++;
+                            }
+                        }
+                    }
+                }
+
+                // 填入值
+                foreach (string key in CompPerformanceCountDict.Keys)
+                {
+                    row[key] = CompPerformanceCountDict[key];
+                }
+
+                row["競賽成績_競賽積分"] = si.CompPerformanceScore;
+                row["成績_合計總分"] = "-100";
 
                 dtTable.Rows.Add(row);
 

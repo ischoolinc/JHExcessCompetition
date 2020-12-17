@@ -81,6 +81,10 @@ namespace ChiaYiExcessCompetition.DAO
         /// </summary>
         public List<rptServiceInfo> ServiceInfoList = new List<rptServiceInfo>();
 
+        /// <summary>
+        /// 競賽資料
+        /// </summary>
+        public List<rptCompPerformanceInfo> CompPerformanceInfoList = new List<rptCompPerformanceInfo>();
 
         /// <summary>
         /// 均衡學習_積分
@@ -146,6 +150,11 @@ namespace ChiaYiExcessCompetition.DAO
         /// 品德表現_體適能_積分
         /// </summary>
         public int FitnessIScore = 0;
+
+        /// <summary>
+        /// 競賽積分
+        /// </summary>
+        public decimal CompPerformanceScore = 0;
 
 
         /// <summary>
@@ -385,6 +394,25 @@ namespace ChiaYiExcessCompetition.DAO
             return age;
         }
 
+        /// <summary>
+        /// 計算競賽積分
+        /// </summary>
+        public void CalCompPerformanceScore()
+        {
+            CompPerformanceScore = 0;
+
+            foreach (rptCompPerformanceInfo cpi in CompPerformanceInfoList)
+            {
+                if (cpi.habitude == "團體賽")
+                {
+                    CompPerformanceScore += (cpi.bt_integral / 2);
+                }
+                else
+                {
+                    CompPerformanceScore += cpi.bt_integral;
+                }
+            }
+        }
 
     }
 }

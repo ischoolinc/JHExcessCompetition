@@ -1085,5 +1085,88 @@ FROM student_info_ext WHERE ref_student_id IN(" + string.Join(",", StudentIDList
         }
 
 
+        /// <summary>
+        /// 取得學生競賽資料並填入
+        /// </summary>
+        /// <param name="StudentIDList"></param>
+        /// <param name="StudInfoList"></param>
+        /// <returns></returns>
+        public static List<rptStudentInfo> FillStudentCompetitionPerformance(List<string> StudentIDList, List<rptStudentInfo> StudInfoList)
+        {
+            try
+            {
+                if (StudentIDList.Count > 0)
+                {
+                    Dictionary<string, List<rptCompPerformanceInfo>> valDict = new Dictionary<string, List<rptCompPerformanceInfo>>();
+                    QueryHelper qh = new QueryHelper();
+                    string SQL = "SELECT  " +
+    " 	ref_student_id AS student_id " +
+    " 	, reward_level " +
+    " 	, setting_name " +
+    " 	, habitude " +
+    " 	, organizer " +
+    " 	, certificate_number " +
+    " 	, certificate_date " +
+    " 	, rank_name " +
+    " 	, bt_integral " +
+    " 	, bt_rank_int " +
+    " FROM $competition.performance.setting " +
+    " INNER JOIN " +
+    "  $competition.performance.student " +
+    " ON $competition.performance.setting.name = $competition.performance.student.setting_name " +
+    " INNER JOIN " +
+    " $competition.performance.rank " +
+    " ON $competition.performance.student.rank_name = $competition.performance.rank.bt_rank  " +
+    " WHERE $competition.performance.student.ref_student_id IN(" + string.Join(",", StudentIDList.ToArray()) + ") " +
+    " ORDER BY ref_student_id,certificate_date ";
+
+                    DataTable dt = qh.Select(SQL);
+
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        rptCompPerformanceInfo data = new rptCompPerformanceInfo();
+                        data.StudentID = dr["student_id"] + "";
+                        data.reward_level = dr["reward_level"] + "";
+                        data.name = dr["setting_name"] + "";
+                        data.habitude = dr["habitude"] + "";
+                        data.organizer = dr["organizer"] + "";
+                        data.certificate_number = dr["certificate_number"] + "";
+                        data.certificate_date = dr["certificate_date"] + "";
+                        data.rank_name = dr["rank_name"] + "";
+                        data.bt_integral = 0;
+                        decimal dd;
+                        if (decimal.TryParse(dr["bt_integral"] + "", out dd))
+                        {
+                            data.bt_integral = dd;
+                        }
+                        data.bt_rank_int = dr["bt_rank_int"] + "";
+
+                        if (!valDict.ContainsKey(data.StudentID))
+                            valDict.Add(data.StudentID, new List<rptCompPerformanceInfo>());
+
+                        valDict[data.StudentID].Add(data);
+                    }
+
+                    // 比對填入學生資料
+                    foreach(rptStudentInfo stud in StudInfoList)
+                    {
+                        if (valDict.ContainsKey(stud.StudentID))
+                        {
+                            stud.CompPerformanceInfoList = valDict[stud.StudentID];
+                            // 計算競賽積分
+                            stud.CalCompPerformanceScore();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("取得學生競賽資料發生錯誤," + ex.Message);
+            }
+
+
+            return StudInfoList;
+        }
+
     }
 }

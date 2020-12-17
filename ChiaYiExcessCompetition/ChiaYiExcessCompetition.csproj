@@ -114,6 +114,7 @@
   <ItemGroup>
     <Compile Include="Configure.cs" />
     <Compile Include="DAO\QueryData.cs" />
+    <Compile Include="DAO\rptCompPerformanceInfo.cs" />
     <Compile Include="DAO\rptDomainScoreInfo.cs" />
     <Compile Include="DAO\rptFitnessInfo.cs" />
     <Compile Include="DAO\rptMeritDemeritInfo.cs" />
