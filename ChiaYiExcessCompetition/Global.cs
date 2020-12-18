@@ -307,9 +307,10 @@ namespace ChiaYiExcessCompetition
             builder.EndRow();
             for (int i = 1; i <= 8; i++)
             {
-                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_縣市個人名次" + i + " \\* MERGEFORMAT ", "«" + "C" + "»");
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_縣市個人名次" + i + " \\* MERGEFORMAT ", "" + "C" + "");
             }
-            builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_縣市個人名次_其他" + " \\* MERGEFORMAT ", "«" + "C" + "»");
+            builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_縣市個人名次_其他" + " \\* MERGEFORMAT ", "" + "C" + "");
+            builder.EndRow();
             builder.EndTable();
 
             builder.Writeln("縣市團體");
@@ -322,9 +323,10 @@ namespace ChiaYiExcessCompetition
             builder.EndRow();
             for (int i = 1; i <= 8; i++)
             {
-                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_縣市團體名次" + i + " \\* MERGEFORMAT ", "«" + "C" + "»");
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_縣市團體名次" + i + " \\* MERGEFORMAT ", "" + "C" + "");
             }
-            builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_縣市團體名次_其他" + " \\* MERGEFORMAT ", "«" + "C" + "»");
+            builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_縣市團體名次_其他" + " \\* MERGEFORMAT ", "" + "C" + "");
+            builder.EndRow();
             builder.EndTable();
 
             builder.Writeln("全國個人");
@@ -337,9 +339,10 @@ namespace ChiaYiExcessCompetition
             builder.EndRow();
             for (int i = 1; i <= 8; i++)
             {
-                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_全國個人名次" + i + " \\* MERGEFORMAT ", "«" + "C" + "»");
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_全國個人名次" + i + " \\* MERGEFORMAT ", "" + "C" + "");
             }
-            builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_全國個人名次_其他" + " \\* MERGEFORMAT ", "«" + "C" + "»");
+            builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_全國個人名次_其他" + " \\* MERGEFORMAT ", "" + "C" + "");
+            builder.EndRow();
             builder.EndTable();
 
             builder.Writeln("全國團體");
@@ -352,10 +355,27 @@ namespace ChiaYiExcessCompetition
             builder.EndRow();
             for (int i = 1; i <= 8; i++)
             {
-                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_全國團體名次" + i + " \\* MERGEFORMAT ", "«" + "C" + "»");
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_全國團體名次" + i + " \\* MERGEFORMAT ", "" + "C" + "");
             }
-            builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_全國團體名次_其他" + " \\* MERGEFORMAT ", "«" + "C" + "»");
+            builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_全國團體名次_其他" + " \\* MERGEFORMAT ", "" + "C" + "");
+            builder.EndRow();
             builder.EndTable();
+
+            builder.Writeln("");
+            builder.StartTable();
+            builder.InsertCell(); builder.Write("競賽成績_競賽積分");
+            builder.InsertCell(); builder.InsertField("MERGEFIELD " + "競賽成績_競賽積分" + " \\* MERGEFORMAT ", "«" + "S" + "»");
+            builder.EndRow();
+            builder.EndTable();
+
+            builder.Writeln("");
+            builder.Writeln("成績-合計總分");
+            builder.StartTable();
+            builder.InsertCell(); builder.Write("成績_合計總分");
+            builder.InsertCell(); builder.InsertField("MERGEFIELD " + "成績_合計總分" + " \\* MERGEFORMAT ", "«" + "S" + "»");
+            builder.EndRow();
+            builder.EndTable();
+
 
 
             try

@@ -576,7 +576,14 @@ namespace ChiaYiExcessCompetition
                 }
 
                 row["競賽成績_競賽積分"] = si.CompPerformanceScore;
-                row["成績_合計總分"] = "-100";
+
+                // 從報表樣板上檢查是由這幾個相加取得總積分：
+                // 品德表現_獎懲_積分
+                // 品德表現_服務學習_積分
+                // 品德表現_體適能_積分
+                // 競賽成績_競賽積分
+
+                row["成績_合計總分"] = si.MDIScore + si.ServiceIScore + si.FitnessIScore + si.CompPerformanceScore;
 
                 dtTable.Rows.Add(row);
 
