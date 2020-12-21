@@ -412,6 +412,11 @@ namespace ChiaYiExcessCompetition.DAO
                     CompPerformanceScore += cpi.bt_integral;
                 }
             }
+
+            // 最高只有10分限制
+            if (CompPerformanceScore > 10)
+                CompPerformanceScore = 10;
+
         }
 
     }
