@@ -53,6 +53,10 @@ namespace ChiaYiExcessCompetition.DAO
         /// </summary>
         public bool IncomeType1 = false;
 
+        /// <summary>
+        /// 扶助弱勢_積分
+        /// </summary>
+        public int IncomeType1Score = 0;
 
         /// <summary>
         /// 學習歷程

@@ -1004,7 +1004,11 @@ FROM student_info_ext WHERE ref_student_id IN(" + string.Join(",", StudentIDList
                         if (compDict[si.StudentID]["income_type"] != null)
                         {
                             if (compDict[si.StudentID]["income_type"].ToString() == "低")
+                            {
                                 si.IncomeType1 = true;
+                                si.IncomeType1Score = 1;
+                            }
+                               
                         }
                     }
                 }
