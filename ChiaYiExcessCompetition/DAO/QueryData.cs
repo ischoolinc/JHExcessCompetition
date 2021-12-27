@@ -611,8 +611,9 @@ ORDER BY class.grade_year DESC,class.display_order,class.class_name,seat_no
             List<string> tmpDomainNameList = new List<string>();
             tmpDomainNameList.Add("健康體育");
             tmpDomainNameList.Add("健康與體育");
-            tmpDomainNameList.Add("藝術人文");
-            tmpDomainNameList.Add("藝術與人文");
+            //tmpDomainNameList.Add("藝術人文");
+            //tmpDomainNameList.Add("藝術與人文");
+            tmpDomainNameList.Add("藝術");
             tmpDomainNameList.Add("綜合活動");
 
             foreach (rptStudentInfo si in StudentInfoList)

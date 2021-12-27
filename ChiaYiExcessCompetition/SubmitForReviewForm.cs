@@ -312,8 +312,8 @@ namespace ChiaYiExcessCompetition
                     // 座號 5
                     wst.Cells[wstRIdx, 5].PutValue(si.SeatNo);
 
-                    // 學生姓名 6
-                    wst.Cells[wstRIdx, 6].PutValue(si.StudentName);
+                    // 學生姓名 6  // 2021-12-27 有些學校會為了整齊把學生的名字+空白，這裡濾掉
+                    wst.Cells[wstRIdx, 6].PutValue(si.StudentName.Replace("　","").Replace(" ", ""));
 
                     // 身分證統一編號 7
                     wst.Cells[wstRIdx, 7].PutValue(si.IDNumber);
@@ -477,7 +477,7 @@ namespace ChiaYiExcessCompetition
                     else
                         wst.Cells[wstRIdx, 30].PutValue(0);
 
-                    // 藝術與人文 31
+                    // 藝術 31
                     if (si.isDoaminArtPass)
                         wst.Cells[wstRIdx, 31].PutValue(1);
                     else
@@ -518,15 +518,25 @@ namespace ChiaYiExcessCompetition
                     {
                         wst.Cells[wstRIdx, 36].PutValue(si.CompPerfSum.Value);
                     }
-              
+                    else  // 2021-12-27 嘉義協同國中 見安老師要求預設值 0
+                    {
+                        wst.Cells[wstRIdx, 36].PutValue("0");
+                    }
 
-                    // 不處理
+                    // 2021-12-27 嘉義協同國中 見安老師要求預設值全部填1
+                    // https://3.basecamp.com/4399967/buckets/15765350/todos/4475736499#__recording_4477516175
                     // 家長意見_高中 37
+                    wst.Cells[wstRIdx, 37].PutValue("1");
                     // 家長意見_高職 38
+                    wst.Cells[wstRIdx, 38].PutValue("1");
                     // 導師意見_高中 39
+                    wst.Cells[wstRIdx, 39].PutValue("1");
                     // 導師意見_高職 40
+                    wst.Cells[wstRIdx, 40].PutValue("1");
                     // 輔導教師意見_高中 41
+                    wst.Cells[wstRIdx, 41].PutValue("1");
                     // 輔導教師意見_高職 42
+                    wst.Cells[wstRIdx, 42].PutValue("1");
 
 
                     wstRIdx++;

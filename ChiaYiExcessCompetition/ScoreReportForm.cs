@@ -246,7 +246,7 @@ namespace ChiaYiExcessCompetition
 
             List<string> domainNameList = new List<string>();
             domainNameList.Add("健康與體育");
-            domainNameList.Add("藝術與人文");
+            domainNameList.Add("藝術");
             domainNameList.Add("綜合活動");
 
 

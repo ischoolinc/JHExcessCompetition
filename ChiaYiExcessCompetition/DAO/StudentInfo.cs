@@ -55,7 +55,7 @@ namespace ChiaYiExcessCompetition.DAO
         public bool isDomainHelPass = false;
         // 綜合活動
         public bool isDomainActPass = false;
-        // 藝術與人文
+        // 藝術與人文//藝術
         public bool isDoaminArtPass = false;
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace ChiaYiExcessCompetition.DAO
                                 score1 += semsRec.Domains[dname].Score.Value;
                         }
 
-                        if (dname == "藝術人文" || dname == "藝術與人文")
+                        if (dname == "藝術")
                         {
                             if (semsRec.Domains[dname].Score.HasValue)
                                 score2 += semsRec.Domains[dname].Score.Value;
