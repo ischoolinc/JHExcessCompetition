@@ -375,23 +375,34 @@ namespace ChiaYiExcessCompetition.DAO
         /// <returns></returns>
         public int GetAge(DateTime dt)
         {
+            //2022-03-08 Cynthia 更新年齡計算方式
+            //https://3.basecamp.com/4399967/buckets/15765350/todos/4706078979
+            // 測驗年月-出生年月 = x年y月;
+            //if (y>=7)  age=x+1; 
+            // else age= x;
+
             int age = 0;
 
             if (dt != null && Birthday != null)
             {
                 if (dt.Year > 1911 && Birthday.Year > 1911)
                 {
-                    // 年齡
-                    int y = dt.Year - Birthday.Year;
+                    // 測驗年*12+月
+                    int testMonths = dt.Year * 12 + dt.Month;
+                    // 生日年*12+月
+                    int birthMonths = Birthday.Year * 12 + Birthday.Month;
 
-                    // 檢查是否滿
-                    DateTime chkDt = new DateTime(dt.Year, Birthday.Month, Birthday.Day);
+                    // 測驗年月-出生年月 的 月份差距
+                    int agesMonthsApart = testMonths - birthMonths;
 
-                    // 如果檢查日大於傳入日期，表示滿，否:-1歲
-                    if (chkDt > dt)
-                        age = y;
-                    else
-                        age = y - 1;
+                    // 月份差距/12 = x
+                    age = agesMonthsApart / 12;
+
+                    // 月份差距/12的餘數 = y
+                    int monthsApart = agesMonthsApart % 12;
+
+                    if (monthsApart >= 7)
+                        age = age + 1;
                 }
             }
 
