@@ -29,10 +29,12 @@ namespace ChiaYiExcessCompetition
 
         List<string> errorMsgList = new List<string>();
 
+        bool IsSingleFileSaved = true;
 
         Dictionary<string, Document> StudentDocDict = new Dictionary<string, Document>();
         Dictionary<string, string> StudentDocNameDict = new Dictionary<string, string>();
-
+        Document _Doc = new Document();
+        List<Document> _DocList = new List<Document>();
 
         public ScoreReportForm()
         {
@@ -63,14 +65,79 @@ namespace ChiaYiExcessCompetition
             // 完成後開啟資料夾
             string p1 = "";
 
-            foreach (string sid in StudentDocDict.Keys)
+
+            if (IsSingleFileSaved)
+                foreach (string sid in StudentDocDict.Keys)
+                {
+                    try
+                    {
+                        Document document = StudentDocDict[sid];
+
+                        #region 儲存檔案
+                        string reportName = "嘉義免試入學-成績冊" + StudentDocNameDict[sid];
+                        path = Path.Combine(System.Windows.Forms.Application.StartupPath, "Reports\\嘉義免試入學成績冊");
+
+                        p1 = path;
+                        if (!Directory.Exists(path))
+                            Directory.CreateDirectory(path);
+
+                        path = Path.Combine(path, reportName + ".doc");
+
+                        if (File.Exists(path))
+                        {
+                            int i = 1;
+                            while (true)
+                            {
+                                string newPath = Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + (i++) + Path.GetExtension(path);
+                                if (!File.Exists(newPath))
+                                {
+                                    path = newPath;
+                                    break;
+                                }
+                            }
+                        }
+
+                        try
+                        {
+                            document.Save(path, SaveFormat.Doc);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Windows.Forms.SaveFileDialog sd = new System.Windows.Forms.SaveFileDialog();
+                            sd.Title = "另存新檔";
+                            sd.FileName = reportName + ".doc";
+                            sd.Filter = "Word檔案 (*.doc)|*.doc|所有檔案 (*.*)|*.*";
+                            if (sd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                            {
+                                try
+                                {
+                                    document.Save(sd.FileName, Aspose.Words.SaveFormat.Doc);
+
+                                }
+                                catch
+                                {
+                                    FISCA.Presentation.Controls.MsgBox.Show("指定路徑無法存取。", "建立檔案失敗", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                    return;
+                                }
+                            }
+                        }
+                        #endregion
+
+                    }
+                    catch (Exception ex)
+                    {
+                        FISCA.Presentation.Controls.MsgBox.Show("產生過程發生錯誤," + ex.Message);
+                    }
+                }
+            else
             {
                 try
                 {
-                    Document document = StudentDocDict[sid];
+
+                    Document document = _Doc;
 
                     #region 儲存檔案
-                    string reportName = "嘉義免試入學-成績冊" + StudentDocNameDict[sid];
+                    string reportName = "嘉義免試入學-成績冊";
                     path = Path.Combine(System.Windows.Forms.Application.StartupPath, "Reports\\嘉義免試入學成績冊");
 
                     p1 = path;
@@ -124,6 +191,10 @@ namespace ChiaYiExcessCompetition
                 {
                     FISCA.Presentation.Controls.MsgBox.Show("產生過程發生錯誤," + ex.Message);
                 }
+
+                _Doc = null;
+                _DocList.Clear();
+                GC.Collect();
             }
 
             System.Diagnostics.Process.Start(p1);
@@ -254,6 +325,7 @@ namespace ChiaYiExcessCompetition
             Dictionary<string, int> CompPerformanceCountDict = new Dictionary<string, int>();
 
 
+
             // 整理資料，填入 DataTable
             foreach (rptStudentInfo si in StudentInfoList)
             {
@@ -272,6 +344,7 @@ namespace ChiaYiExcessCompetition
                 dtTable.Columns.Add("班級");
                 dtTable.Columns.Add("座號");
                 dtTable.Columns.Add("姓名");
+                dtTable.Columns.Add("學號");
                 dtTable.Columns.Add("扶助弱勢_身分");
                 dtTable.Columns.Add("扶助弱勢_積分");
 
@@ -395,6 +468,7 @@ namespace ChiaYiExcessCompetition
                 row["班級"] = si.ClassName;
                 row["座號"] = si.SeatNo;
                 row["姓名"] = si.Name;
+                row["學號"] = si.StudentNumber;
 
                 if (si.IncomeType1)
                 {
@@ -585,7 +659,7 @@ namespace ChiaYiExcessCompetition
                 // 品德表現_體適能_積分
                 // 競賽成績_競賽積分
 
-                row["成績_合計總分"] = si.IncomeType1Score+ si.DomainIScore + si.MDIScore + si.ServiceIScore + si.FitnessIScore + si.CompPerformanceScore;
+                row["成績_合計總分"] = si.IncomeType1Score + si.DomainIScore + si.MDIScore + si.ServiceIScore + si.FitnessIScore + si.CompPerformanceScore;
 
                 dtTable.Rows.Add(row);
 
@@ -603,12 +677,18 @@ namespace ChiaYiExcessCompetition
                     StudentDocNameDict.Add(si.StudentID, si.ClassName + "班" + si.SeatNo + "號");
                 }
 
-
+                if (!IsSingleFileSaved)
+                    _DocList.Add(docTemplate);
             }
 
+            if (!IsSingleFileSaved)
+            {
+                _Doc.Sections.Clear();
+                foreach (Document doc2 in _DocList)
+                    _Doc.Sections.Add(_Doc.ImportNode(doc2.Sections[0], true));
+            }
 
             bgWorkerReport.ReportProgress(90);
-
 
         }
 
@@ -625,7 +705,7 @@ namespace ChiaYiExcessCompetition
         private void btnPrint_Click(object sender, EventArgs e)
         {
             UserControlEnable(false);
-
+            IsSingleFileSaved = ckbSingleFile.Checked;
             bgWorkerReport.RunWorkerAsync();
         }
 

@@ -34,6 +34,7 @@
             this.lnkChangeTemplate = new System.Windows.Forms.LinkLabel();
             this.btnPrint = new DevComponents.DotNetBar.ButtonX();
             this.btnCancel = new DevComponents.DotNetBar.ButtonX();
+            this.ckbSingleFile = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.SuspendLayout();
             // 
             // lnkDefault
@@ -42,7 +43,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lnkDefault.AutoSize = true;
             this.lnkDefault.BackColor = System.Drawing.Color.Transparent;
-            this.lnkDefault.Location = new System.Drawing.Point(314, 35);
+            this.lnkDefault.Location = new System.Drawing.Point(314, 51);
             this.lnkDefault.Name = "lnkDefault";
             this.lnkDefault.Size = new System.Drawing.Size(86, 17);
             this.lnkDefault.TabIndex = 9;
@@ -56,7 +57,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lnkViewMapColumns.AutoSize = true;
             this.lnkViewMapColumns.BackColor = System.Drawing.Color.Transparent;
-            this.lnkViewMapColumns.Location = new System.Drawing.Point(196, 35);
+            this.lnkViewMapColumns.Location = new System.Drawing.Point(196, 51);
             this.lnkViewMapColumns.Name = "lnkViewMapColumns";
             this.lnkViewMapColumns.Size = new System.Drawing.Size(112, 17);
             this.lnkViewMapColumns.TabIndex = 8;
@@ -70,7 +71,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lnkViewTemplate.AutoSize = true;
             this.lnkViewTemplate.BackColor = System.Drawing.Color.Transparent;
-            this.lnkViewTemplate.Location = new System.Drawing.Point(17, 35);
+            this.lnkViewTemplate.Location = new System.Drawing.Point(17, 51);
             this.lnkViewTemplate.Name = "lnkViewTemplate";
             this.lnkViewTemplate.Size = new System.Drawing.Size(86, 17);
             this.lnkViewTemplate.TabIndex = 6;
@@ -84,7 +85,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lnkChangeTemplate.AutoSize = true;
             this.lnkChangeTemplate.BackColor = System.Drawing.Color.Transparent;
-            this.lnkChangeTemplate.Location = new System.Drawing.Point(106, 35);
+            this.lnkChangeTemplate.Location = new System.Drawing.Point(106, 51);
             this.lnkChangeTemplate.Name = "lnkChangeTemplate";
             this.lnkChangeTemplate.Size = new System.Drawing.Size(86, 17);
             this.lnkChangeTemplate.TabIndex = 7;
@@ -99,7 +100,7 @@
             this.btnPrint.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
             this.btnPrint.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnPrint.Enabled = false;
-            this.btnPrint.Location = new System.Drawing.Point(419, 32);
+            this.btnPrint.Location = new System.Drawing.Point(419, 48);
             this.btnPrint.Name = "btnPrint";
             this.btnPrint.Size = new System.Drawing.Size(67, 23);
             this.btnPrint.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -113,7 +114,7 @@
             this.btnCancel.BackColor = System.Drawing.Color.Transparent;
             this.btnCancel.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(492, 32);
+            this.btnCancel.Location = new System.Drawing.Point(492, 48);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(67, 23);
             this.btnCancel.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -121,11 +122,30 @@
             this.btnCancel.Text = "離開";
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
+            // ckbSingleFile
+            // 
+            this.ckbSingleFile.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.ckbSingleFile.BackgroundStyle.Class = "";
+            this.ckbSingleFile.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.ckbSingleFile.Checked = true;
+            this.ckbSingleFile.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ckbSingleFile.CheckValue = "Y";
+            this.ckbSingleFile.Location = new System.Drawing.Point(20, 12);
+            this.ckbSingleFile.Name = "ckbSingleFile";
+            this.ckbSingleFile.Size = new System.Drawing.Size(96, 23);
+            this.ckbSingleFile.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.ckbSingleFile.TabIndex = 12;
+            this.ckbSingleFile.Text = "單檔列印";
+            // 
             // ScoreReportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(577, 86);
+            this.Controls.Add(this.ckbSingleFile);
             this.Controls.Add(this.lnkDefault);
             this.Controls.Add(this.lnkViewMapColumns);
             this.Controls.Add(this.lnkViewTemplate);
@@ -149,5 +169,6 @@
         private System.Windows.Forms.LinkLabel lnkChangeTemplate;
         private DevComponents.DotNetBar.ButtonX btnPrint;
         private DevComponents.DotNetBar.ButtonX btnCancel;
+        private DevComponents.DotNetBar.Controls.CheckBoxX ckbSingleFile;
     }
 }

@@ -488,6 +488,7 @@ SELECT
         student.id AS student_id
         ,class.class_name
         ,student.seat_no
+    ,student_number
         ,CASE student.gender WHEN '1' THEN '男' WHEN '0' THEN '女' ELSE '' END AS gender
         ,student.name AS student_name
         ,sems_history
@@ -510,6 +511,7 @@ ORDER BY class.grade_year DESC,class.display_order,class.class_name,seat_no
                         si.SchoolYear = K12.Data.School.DefaultSchoolYear;
                         si.SchoolName = K12.Data.School.ChineseName;
                         si.Name = dr["student_name"].ToString();
+                        si.StudentNumber= dr["student_number"].ToString();
 
                         DateTime dt1;
 

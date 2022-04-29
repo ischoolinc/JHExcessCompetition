@@ -46,6 +46,11 @@ namespace ChiaYiExcessCompetition.DAO
         /// </summary>
         public string Gender { get; set; }
 
+        /// <summary>
+        /// 學號
+        /// </summary>
+        public string StudentNumber { get; set; }
+
         public DateTime Birthday { get; set; }
 
         /// <summary>
