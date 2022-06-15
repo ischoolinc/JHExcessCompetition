@@ -205,6 +205,7 @@ namespace ChiaYiExcessCompetition.DAO
 
         public void CalcDomainScoreInfoList()
         {
+            List<string> domainList = new List<string> { "健康體育", "健康與體育", "藝術", "綜合活動" };
             foreach (string dname in DomainScoreInfoDict.Keys)
             {
                 decimal score = 0;
@@ -217,8 +218,9 @@ namespace ChiaYiExcessCompetition.DAO
                 DomainScoreInfoDict[dname].AvgScore = Math.Round(score / 5, 0, MidpointRounding.AwayFromZero);
 
                 // 計算積分
-                if (DomainScoreInfoDict[dname].AvgScore >= 60)
-                    DomainIScore += 3;
+                if (domainList.Contains(dname))
+                    if (DomainScoreInfoDict[dname].AvgScore >= 60)
+                        DomainIScore += 3;
             }
         }
 

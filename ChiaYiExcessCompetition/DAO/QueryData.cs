@@ -618,6 +618,11 @@ ORDER BY class.grade_year DESC,class.display_order,class.class_name,seat_no
             tmpDomainNameList.Add("藝術");
             tmpDomainNameList.Add("綜合活動");
 
+            tmpDomainNameList.Add("語文");
+            tmpDomainNameList.Add("數學");
+            tmpDomainNameList.Add("自然科學");
+            tmpDomainNameList.Add("科技");
+
             foreach (rptStudentInfo si in StudentInfoList)
             {
                 if (SemesterScoreRecordDict.ContainsKey(si.StudentID))

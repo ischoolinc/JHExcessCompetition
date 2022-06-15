@@ -130,6 +130,45 @@ namespace ChiaYiExcessCompetition
             builder.EndTable();
             builder.Writeln();
 
+            List<string> otherDomainNameList = new List<string>();
+            otherDomainNameList.Add("語文");
+            otherDomainNameList.Add("數學");
+            otherDomainNameList.Add("自然科學");
+            otherDomainNameList.Add("科技");
+
+            builder.Writeln("其他領域成績");
+            builder.StartTable();
+            builder.InsertCell(); builder.Write("領域");
+            builder.InsertCell(); builder.Write("七上");
+            builder.InsertCell(); builder.Write("七下");
+            builder.InsertCell(); builder.Write("八上");
+            builder.InsertCell(); builder.Write("八下");
+            builder.InsertCell(); builder.Write("九上");
+            builder.InsertCell(); builder.Write("平均");
+            builder.EndRow();
+
+            foreach (string dName in otherDomainNameList)
+            {
+                builder.InsertCell();
+                builder.Write(dName);
+
+                builder.InsertCell();
+                builder.InsertField("MERGEFIELD " + "其他領域_" + dName + "_七上分數" + " \\* MERGEFORMAT ", "«" + "DS" + "»");
+                builder.InsertCell();
+                builder.InsertField("MERGEFIELD " + "其他領域_" + dName + "_七下分數" + " \\* MERGEFORMAT ", "«" + "DS" + "»");
+                builder.InsertCell();
+                builder.InsertField("MERGEFIELD " + "其他領域_" + dName + "_八上分數" + " \\* MERGEFORMAT ", "«" + "DS" + "»");
+                builder.InsertCell();
+                builder.InsertField("MERGEFIELD " + "其他領域_" + dName + "_八下分數" + " \\* MERGEFORMAT ", "«" + "DS" + "»");
+                builder.InsertCell();
+                builder.InsertField("MERGEFIELD " + "其他領域_" + dName + "_九上分數" + " \\* MERGEFORMAT ", "«" + "DS" + "»");
+                builder.InsertCell();
+                builder.InsertField("MERGEFIELD " + "其他領域_" + dName + "_平均" + " \\* MERGEFORMAT ", "«" + "DS" + "»");
+                builder.EndRow();
+            }
+            builder.EndTable();
+            builder.Writeln();
+
             builder.Writeln("獎懲統計");
             builder.StartTable();
             builder.InsertCell(); builder.Write("大功");

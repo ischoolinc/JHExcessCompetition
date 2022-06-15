@@ -320,6 +320,11 @@ namespace ChiaYiExcessCompetition
             domainNameList.Add("藝術");
             domainNameList.Add("綜合活動");
 
+            List<string> otherDomainNameList = new List<string>();
+            otherDomainNameList.Add("語文");
+            otherDomainNameList.Add("數學");
+            otherDomainNameList.Add("自然科學");
+            otherDomainNameList.Add("科技");
 
             //競賽統計
             Dictionary<string, int> CompPerformanceCountDict = new Dictionary<string, int>();
@@ -356,6 +361,16 @@ namespace ChiaYiExcessCompetition
                     dtTable.Columns.Add("均衡學習_" + name + "_八下分數");
                     dtTable.Columns.Add("均衡學習_" + name + "_九上分數");
                     dtTable.Columns.Add("均衡學習_" + name + "_平均");
+                }
+
+                foreach (string name in otherDomainNameList)
+                {
+                    dtTable.Columns.Add("其他領域_" + name + "_七上分數");
+                    dtTable.Columns.Add("其他領域_" + name + "_七下分數");
+                    dtTable.Columns.Add("其他領域_" + name + "_八上分數");
+                    dtTable.Columns.Add("其他領域_" + name + "_八下分數");
+                    dtTable.Columns.Add("其他領域_" + name + "_九上分數");
+                    dtTable.Columns.Add("其他領域_" + name + "_平均");
                 }
 
                 dtTable.Columns.Add("均衡學習_積分");
@@ -492,6 +507,19 @@ namespace ChiaYiExcessCompetition
                         row["均衡學習_" + name + "_八下分數"] = si.GetDomainSemsScore(name, "八下");
                         row["均衡學習_" + name + "_九上分數"] = si.GetDomainSemsScore(name, "九上");
                         row["均衡學習_" + name + "_平均"] = si.DomainScoreInfoDict[name].AvgScore;
+                    }
+                }
+
+                foreach (string name in otherDomainNameList)
+                {
+                    if (si.DomainScoreInfoDict.ContainsKey(name))
+                    {
+                        row["其他領域_" + name + "_七上分數"] = si.GetDomainSemsScore(name, "七上");
+                        row["其他領域_" + name + "_七下分數"] = si.GetDomainSemsScore(name, "七下");
+                        row["其他領域_" + name + "_八上分數"] = si.GetDomainSemsScore(name, "八上");
+                        row["其他領域_" + name + "_八下分數"] = si.GetDomainSemsScore(name, "八下");
+                        row["其他領域_" + name + "_九上分數"] = si.GetDomainSemsScore(name, "九上");
+                        row["其他領域_" + name + "_平均"] = si.DomainScoreInfoDict[name].AvgScore;
                     }
                 }
 
