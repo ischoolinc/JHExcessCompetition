@@ -57,6 +57,10 @@ namespace ChiaYiExcessCompetition.DAO
         public bool isDomainActPass = false;
         // 藝術與人文//藝術
         public bool isDoaminArtPass = false;
+        /// <summary>
+        /// 科技
+        /// </summary>
+        public bool isDoaminTechPass = false;
 
         /// <summary>
         /// 服務學習時數分數
@@ -164,12 +168,12 @@ namespace ChiaYiExcessCompetition.DAO
         {
             Semester5Score = 0;
             hasSemester5Score = true;
-            decimal score1 = 0, score2 = 0, score3 = 0;
+            decimal score1 = 0, score2 = 0, score3 = 0, score4=0;
 
             isDomainHelPass = false;
             isDomainActPass = false;
             isDoaminArtPass = false;
-
+            isDoaminTechPass = false;
 
             List<string> tmpList = new List<string>();
             foreach (SemsHistoryInfo sh in SemsHistoryInfoList)
@@ -205,6 +209,8 @@ namespace ChiaYiExcessCompetition.DAO
             //績達及格以上者，計 9 分。"
             // 佳樺提供需求需要使用擇優成績，平均計算到整數四捨五入。
 
+            //2023-01-04 加入科技 改上限12分
+            //https://3.basecamp.com/4399967/buckets/15765350/todos/5679930879
             foreach (JHSemesterScoreRecord semsRec in SemsScoreList)
             {
                 string key = semsRec.SchoolYear + "_" + semsRec.Semester;
@@ -229,6 +235,12 @@ namespace ChiaYiExcessCompetition.DAO
                             if (semsRec.Domains[dname].Score.HasValue)
                                 score3 += semsRec.Domains[dname].Score.Value;
                         }
+
+                        if (dname == "科技")
+                        {
+                            if (semsRec.Domains[dname].Score.HasValue)
+                                score4 += semsRec.Domains[dname].Score.Value;
+                        }
                     }
                 }
             }
@@ -236,6 +248,7 @@ namespace ChiaYiExcessCompetition.DAO
             score1 = Math.Round(score1 / 5, 0, MidpointRounding.AwayFromZero);
             score2 = Math.Round(score2 / 5, 0, MidpointRounding.AwayFromZero);
             score3 = Math.Round(score3 / 5, 0, MidpointRounding.AwayFromZero);
+            score4 = Math.Round(score4 / 5, 0, MidpointRounding.AwayFromZero);
 
             if (score1 >= 60)
             {
@@ -255,6 +268,12 @@ namespace ChiaYiExcessCompetition.DAO
                 isDomainActPass = true;
             }
 
+            if (score4 >= 60)
+            {
+                Semester5Score += 3;
+                isDoaminTechPass = true;
+            }
+            
         }
 
         /// <summary>

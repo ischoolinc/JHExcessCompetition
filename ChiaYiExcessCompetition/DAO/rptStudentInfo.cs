@@ -205,7 +205,7 @@ namespace ChiaYiExcessCompetition.DAO
 
         public void CalcDomainScoreInfoList()
         {
-            List<string> domainList = new List<string> { "健康體育", "健康與體育", "藝術", "綜合活動" };
+            List<string> domainList = new List<string> { "健康體育", "健康與體育", "藝術", "綜合活動", "科技" };
             foreach (string dname in DomainScoreInfoDict.Keys)
             {
                 decimal score = 0;

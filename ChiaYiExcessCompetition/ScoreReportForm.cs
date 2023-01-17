@@ -319,12 +319,13 @@ namespace ChiaYiExcessCompetition
             domainNameList.Add("健康與體育");
             domainNameList.Add("藝術");
             domainNameList.Add("綜合活動");
+            domainNameList.Add("科技");
 
             List<string> otherDomainNameList = new List<string>();
             otherDomainNameList.Add("語文");
             otherDomainNameList.Add("數學");
             otherDomainNameList.Add("自然科學");
-            otherDomainNameList.Add("科技");
+            //otherDomainNameList.Add("科技");
 
             //競賽統計
             Dictionary<string, int> CompPerformanceCountDict = new Dictionary<string, int>();

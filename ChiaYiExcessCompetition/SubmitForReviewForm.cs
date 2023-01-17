@@ -489,7 +489,13 @@ namespace ChiaYiExcessCompetition
                     else
                         wst.Cells[wstRIdx, 32].PutValue(0);
 
-                    // 品德表現 33
+                    //科技 2023-01-05 33
+                    if (si.isDoaminTechPass)
+                        wst.Cells[wstRIdx, 33].PutValue(1);
+                    else
+                        wst.Cells[wstRIdx, 33].PutValue(0);
+
+                    // 品德表現 34
                     List<JHDemeritRecord> recD;
                     List<JHMeritRecord> recM;
 
@@ -504,39 +510,39 @@ namespace ChiaYiExcessCompetition
                         recM = new List<JHMeritRecord>();
 
                     si.CalcDemeritMemeritScore(recD, recM, DemeritReduceRecord);
-                    wst.Cells[wstRIdx, 33].PutValue(si.MeritDemeritScore);
+                    wst.Cells[wstRIdx, 34].PutValue(si.MeritDemeritScore);
 
-                    // 服務學習 34
-                    wst.Cells[wstRIdx, 34].PutValue(si.ServiceLearnScore);
+                    // 服務學習 35
+                    wst.Cells[wstRIdx, 35].PutValue(si.ServiceLearnScore);
 
-                    // 體適能 35
+                    // 體適能 36
                     si.CalcFitnessScore();
-                    wst.Cells[wstRIdx, 35].PutValue(si.FitnessScore);
+                    wst.Cells[wstRIdx, 36].PutValue(si.FitnessScore);
 
-                    // 競賽表現 36,使用者自行處理
+                    // 競賽表現 37,使用者自行處理
                     if (si.CompPerfSum.HasValue)
                     {
-                        wst.Cells[wstRIdx, 36].PutValue(si.CompPerfSum.Value);
+                        wst.Cells[wstRIdx, 37].PutValue(si.CompPerfSum.Value);
                     }
                     else  // 2021-12-27 嘉義協同國中 見安老師要求預設值 0
                     {
-                        wst.Cells[wstRIdx, 36].PutValue("0");
+                        wst.Cells[wstRIdx, 37].PutValue("0");
                     }
 
                     // 2021-12-27 嘉義協同國中 見安老師要求預設值全部填1
                     // https://3.basecamp.com/4399967/buckets/15765350/todos/4475736499#__recording_4477516175
-                    // 家長意見_高中 37
-                    wst.Cells[wstRIdx, 37].PutValue("1");
-                    // 家長意見_高職 38
+                    // 家長意見_高中 38
                     wst.Cells[wstRIdx, 38].PutValue("1");
-                    // 導師意見_高中 39
+                    // 家長意見_高職 39
                     wst.Cells[wstRIdx, 39].PutValue("1");
-                    // 導師意見_高職 40
+                    // 導師意見_高中 40
                     wst.Cells[wstRIdx, 40].PutValue("1");
-                    // 輔導教師意見_高中 41
+                    // 導師意見_高職 41
                     wst.Cells[wstRIdx, 41].PutValue("1");
-                    // 輔導教師意見_高職 42
+                    // 輔導教師意見_高中 42
                     wst.Cells[wstRIdx, 42].PutValue("1");
+                    // 輔導教師意見_高職 43
+                    wst.Cells[wstRIdx, 43].PutValue("1");
 
 
                     wstRIdx++;
