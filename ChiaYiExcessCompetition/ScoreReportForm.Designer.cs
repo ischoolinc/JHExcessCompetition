@@ -154,7 +154,7 @@
             this.Controls.Add(this.btnCancel);
             this.DoubleBuffered = true;
             this.Name = "ScoreReportForm";
-            this.Text = "成績冊";
+            this.Text = "超額比序均衡學習成績證明單";
             this.Load += new System.EventHandler(this.ScoreReportForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

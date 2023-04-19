@@ -47,7 +47,7 @@ namespace ChiaYiExcessCompetition
 
         private void BgWorkerReport_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            FISCA.Presentation.MotherForm.SetStatusBarMessage("成績冊產生中...", e.ProgressPercentage);
+            FISCA.Presentation.MotherForm.SetStatusBarMessage("超額比序均衡學習成績證明單產生中...", e.ProgressPercentage);
         }
 
         private void BgWorkerReport_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -67,68 +67,75 @@ namespace ChiaYiExcessCompetition
 
 
             if (IsSingleFileSaved)
-                foreach (string sid in StudentDocDict.Keys)
-                {
-                    try
+            {
+                if (StudentDocDict.Count > 0)
+                    foreach (string sid in StudentDocDict.Keys)
                     {
-                        Document document = StudentDocDict[sid];
-
-                        #region 儲存檔案
-                        string reportName = "嘉義免試入學-成績冊" + StudentDocNameDict[sid];
-                        path = Path.Combine(System.Windows.Forms.Application.StartupPath, "Reports\\嘉義免試入學成績冊");
-
-                        p1 = path;
-                        if (!Directory.Exists(path))
-                            Directory.CreateDirectory(path);
-
-                        path = Path.Combine(path, reportName + ".doc");
-
-                        if (File.Exists(path))
-                        {
-                            int i = 1;
-                            while (true)
-                            {
-                                string newPath = Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + (i++) + Path.GetExtension(path);
-                                if (!File.Exists(newPath))
-                                {
-                                    path = newPath;
-                                    break;
-                                }
-                            }
-                        }
-
                         try
                         {
-                            document.Save(path, SaveFormat.Doc);
+                            Document document = StudentDocDict[sid];
+
+                            #region 儲存檔案
+                            string reportName = "嘉義免試入學-超額比序均衡學習成績證明單" + StudentDocNameDict[sid];
+                            path = Path.Combine(System.Windows.Forms.Application.StartupPath, "Reports\\嘉義免試入學超額比序均衡學習成績證明單");
+
+                            p1 = path;
+                            if (!Directory.Exists(path))
+                                Directory.CreateDirectory(path);
+
+                            path = Path.Combine(path, reportName + ".doc");
+
+                            if (File.Exists(path))
+                            {
+                                int i = 1;
+                                while (true)
+                                {
+                                    string newPath = Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + (i++) + Path.GetExtension(path);
+                                    if (!File.Exists(newPath))
+                                    {
+                                        path = newPath;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            try
+                            {
+                                document.Save(path, SaveFormat.Doc);
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Windows.Forms.SaveFileDialog sd = new System.Windows.Forms.SaveFileDialog();
+                                sd.Title = "另存新檔";
+                                sd.FileName = reportName + ".doc";
+                                sd.Filter = "Word檔案 (*.doc)|*.doc|所有檔案 (*.*)|*.*";
+                                if (sd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                                {
+                                    try
+                                    {
+                                        document.Save(sd.FileName, Aspose.Words.SaveFormat.Doc);
+
+                                    }
+                                    catch
+                                    {
+                                        FISCA.Presentation.Controls.MsgBox.Show("指定路徑無法存取。", "建立檔案失敗", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                        return;
+                                    }
+                                }
+                            }
+                            #endregion
+
                         }
                         catch (Exception ex)
                         {
-                            System.Windows.Forms.SaveFileDialog sd = new System.Windows.Forms.SaveFileDialog();
-                            sd.Title = "另存新檔";
-                            sd.FileName = reportName + ".doc";
-                            sd.Filter = "Word檔案 (*.doc)|*.doc|所有檔案 (*.*)|*.*";
-                            if (sd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                            {
-                                try
-                                {
-                                    document.Save(sd.FileName, Aspose.Words.SaveFormat.Doc);
-
-                                }
-                                catch
-                                {
-                                    FISCA.Presentation.Controls.MsgBox.Show("指定路徑無法存取。", "建立檔案失敗", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                                    return;
-                                }
-                            }
+                            FISCA.Presentation.Controls.MsgBox.Show("產生過程發生錯誤," + ex.Message);
                         }
-                        #endregion
-
                     }
-                    catch (Exception ex)
-                    {
-                        FISCA.Presentation.Controls.MsgBox.Show("產生過程發生錯誤," + ex.Message);
-                    }
+                else
+                {
+                    return;
                 }
+            }
             else
             {
                 try
@@ -137,8 +144,8 @@ namespace ChiaYiExcessCompetition
                     Document document = _Doc;
 
                     #region 儲存檔案
-                    string reportName = "嘉義免試入學-成績冊";
-                    path = Path.Combine(System.Windows.Forms.Application.StartupPath, "Reports\\嘉義免試入學成績冊");
+                    string reportName = "嘉義免試入學-超額比序均衡學習成績證明單";
+                    path = Path.Combine(System.Windows.Forms.Application.StartupPath, "Reports\\嘉義免試入學超額比序均衡學習成績證明單");
 
                     p1 = path;
                     if (!Directory.Exists(path))
@@ -196,8 +203,8 @@ namespace ChiaYiExcessCompetition
                 _DocList.Clear();
                 GC.Collect();
             }
-
-            System.Diagnostics.Process.Start(p1);
+            if (p1 != "")
+                System.Diagnostics.Process.Start(p1);
         }
 
         private void BgWorkerReport_DoWork(object sender, DoWorkEventArgs e)
@@ -209,6 +216,11 @@ namespace ChiaYiExcessCompetition
             // 取得所選學生資料
             List<rptStudentInfo> StudentInfoList = QueryData.GetRptStudentInfoListByIDs(StudentIDList);
 
+            if (StudentInfoList.Count < 1)
+            {
+                MsgBox.Show("所選的學生皆非「在校生」，沒有可列印的資料。", "超額比序均衡學習成績證明單",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                return;
+            }
             // 轉換各項類別對照值
             Dictionary<string, string> MappingTag1 = new Dictionary<string, string>();
             Dictionary<string, string> MappingTag2 = new Dictionary<string, string>();
@@ -741,7 +753,7 @@ namespace ChiaYiExcessCompetition
         private void lnkDefault_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             lnkDefault.Enabled = false;
-            string reportName = "嘉義免試入學-成績冊";
+            string reportName = "嘉義免試入學-超額比序均衡學習成績證明單";
 
             string path = Path.Combine(System.Windows.Forms.Application.StartupPath, "Reports");
             if (!Directory.Exists(path))
@@ -792,9 +804,14 @@ namespace ChiaYiExcessCompetition
             lnkDefault.Enabled = true;
         }
 
+        /// <summary>
+        /// 合併欄位總表
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void lnkViewMapColumns_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            FISCA.Presentation.MotherForm.SetStatusBarMessage("成績冊合併欄位總表產生中...");
+            FISCA.Presentation.MotherForm.SetStatusBarMessage("超額比序均衡學習成績證明單合併欄位總表產生中...");
 
             // 產生合併欄位總表
             lnkViewMapColumns.Enabled = false;
@@ -828,14 +845,20 @@ namespace ChiaYiExcessCompetition
             lnkChangeTemplate.Enabled = true;
         }
 
+        /// <summary>
+        /// 檢視套印樣板
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void lnkViewTemplate_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
+
             // 當沒有設定檔
             if (_Configure == null) return;
             lnkViewTemplate.Enabled = false;
             #region 儲存檔案
 
-            string reportName = "嘉義免試入學-成績冊";
+            string reportName = "嘉義免試入學-超額比序均衡學習成績證明單";
 
             string path = Path.Combine(System.Windows.Forms.Application.StartupPath, "Reports");
             if (!Directory.Exists(path))
@@ -891,7 +914,7 @@ namespace ChiaYiExcessCompetition
         {
             this.MinimumSize = this.MaximumSize = this.Size;
             LoadTemplate();
-            this.Text = "成績冊(資料統計至" + _Configure.EndDate.Year + "年" + _Configure.EndDate.Month + "月" + _Configure.EndDate.Day + "日)";
+            this.Text = "超額比序均衡學習成績證明單(資料統計至" + _Configure.EndDate.Year + "年" + _Configure.EndDate.Month + "月" + _Configure.EndDate.Day + "日)";
         }
 
         private void LoadTemplate()

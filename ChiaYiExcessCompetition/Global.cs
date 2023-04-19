@@ -12,14 +12,14 @@ namespace ChiaYiExcessCompetition
     {
         public const string _UDTTableName = "ischool.ChiaYiExcessCompetition.configure";
 
-        public static string _ProjectName = "嘉義免試入學-成績冊";
+        public static string _ProjectName = "嘉義區超額比序均衡學習成績證明單";
 
         public static string _DefaultConfTypeName = "預設設定檔";
 
         public static void ExportMappingFieldWord()
         {
 
-            string inputReportName = "嘉義免試入學成績冊合併欄位總表";
+            string inputReportName = "嘉義區超額比序均衡學習成績證明單合併欄位總表";
             string reportName = inputReportName;
 
             string path = Path.Combine(System.Windows.Forms.Application.StartupPath, "Reports");
