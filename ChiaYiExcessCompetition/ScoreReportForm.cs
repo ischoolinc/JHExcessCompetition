@@ -436,6 +436,10 @@ namespace ChiaYiExcessCompetition
                     dtTable.Columns.Add("品德表現_體適能_立定跳遠_等級" + i);
                     dtTable.Columns.Add("品德表現_體適能_仰臥起坐_等級" + i);
                     dtTable.Columns.Add("品德表現_體適能_公尺跑走_等級" + i);
+                    dtTable.Columns.Add("品德表現_體適能_仰臥捲腹_成績" + i);
+                    dtTable.Columns.Add("品德表現_體適能_漸速耐力跑_成績" + i);
+                    dtTable.Columns.Add("品德表現_體適能_仰臥捲腹_等級" + i);
+                    dtTable.Columns.Add("品德表現_體適能_漸速耐力跑_等級" + i);
                 }
                 #endregion
 
@@ -604,6 +608,11 @@ namespace ChiaYiExcessCompetition
                     row["品德表現_體適能_立定跳遠_等級" + idx] = fi.Standing_long_jump_degree;
                     row["品德表現_體適能_仰臥起坐_等級" + idx] = fi.Sit_up_degree;
                     row["品德表現_體適能_公尺跑走_等級" + idx] = fi.Cardiorespiratory_degree;
+
+                    row["品德表現_體適能_仰臥捲腹_成績" + idx] = fi.Curl;
+                    row["品德表現_體適能_仰臥捲腹_等級" + idx] = fi.CurlDegree;
+                    row["品德表現_體適能_漸速耐力跑_成績" + idx] = fi.Pacer;
+                    row["品德表現_體適能_漸速耐力跑_等級" + idx] = fi.PacerDegree;
 
                     idx++;
                 }

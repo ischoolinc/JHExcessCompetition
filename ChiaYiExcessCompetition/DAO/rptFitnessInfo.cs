@@ -67,5 +67,25 @@ namespace ChiaYiExcessCompetition.DAO
         /// 品德表現_體適能_公尺跑走_等級
         /// </summary>
         public string Cardiorespiratory_degree { get; set; }
+
+        /// <summary>
+        ///  仰臥捲腹
+        /// </summary>        
+        public string Curl { get; set; }
+
+        /// <summary>
+        ///  仰臥捲腹常模
+        /// </summary>        
+        public string CurlDegree { get; set; }
+
+        /// <summary>
+        ///  漸速耐力跑
+        /// </summary>        
+        public string Pacer { get; set; }
+
+        /// <summary>
+        ///  漸速耐力跑常模
+        /// </summary>        
+        public string PacerDegree { get; set; }
     }
 }

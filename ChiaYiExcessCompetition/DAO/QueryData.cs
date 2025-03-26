@@ -692,6 +692,10 @@ SELECT
     ,sit_up_degree
     ,cardiorespiratory
     ,cardiorespiratory_degree
+    ,curl
+    ,curl_degree
+    ,pacer
+    ,pacer_degree
 FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", StudentIDList.ToArray()) + @"') 
 ORDER BY test_date";
                     DataTable dt = qh.Select(qry);
@@ -723,6 +727,11 @@ ORDER BY test_date";
                             fi.Sit_up_degree = dr["sit_up_degree"].ToString();
                             fi.Cardiorespiratory = dr["cardiorespiratory"].ToString();
                             fi.Cardiorespiratory_degree = dr["cardiorespiratory_degree"].ToString();
+
+                            fi.Curl = dr["curl"] + "";
+                            fi.CurlDegree = dr["curl_degree"] + "";
+                            fi.Pacer = dr["pacer"] + "";
+                            fi.PacerDegree = dr["pacer_degree"] + "";
 
                             tmpFitDict[sid].Add(fi);
                         }

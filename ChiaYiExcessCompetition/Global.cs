@@ -294,6 +294,10 @@ namespace ChiaYiExcessCompetition
             builder.InsertCell(); builder.Write("仰臥起坐_等級");
             builder.InsertCell(); builder.Write("公尺跑走_成績");
             builder.InsertCell(); builder.Write("公尺跑走_等級");
+            builder.InsertCell(); builder.Write("仰臥捲腹_成績");
+            builder.InsertCell(); builder.Write("仰臥捲腹_等級");
+            builder.InsertCell(); builder.Write("漸速耐力跑_成績");
+            builder.InsertCell(); builder.Write("漸速耐力跑_等級");
             builder.EndRow();
 
             for (int i = 1; i <= 10; i++)
@@ -310,6 +314,16 @@ namespace ChiaYiExcessCompetition
                 builder.InsertCell(); builder.InsertField("MERGEFIELD " + "品德表現_體適能_公尺跑走_成績" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
 
                 builder.InsertCell(); builder.InsertField("MERGEFIELD " + "品德表現_體適能_公尺跑走_等級" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
+
+
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "品德表現_體適能_仰臥捲腹_成績" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
+
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "品德表現_體適能_仰臥捲腹_等級" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
+
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "品德表現_體適能_漸速耐力跑_成績" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
+
+                builder.InsertCell(); builder.InsertField("MERGEFIELD " + "品德表現_體適能_漸速耐力跑_等級" + i + " \\* MERGEFORMAT ", "«" + "D" + i + "»");
+
                 builder.EndRow();
             }
 
