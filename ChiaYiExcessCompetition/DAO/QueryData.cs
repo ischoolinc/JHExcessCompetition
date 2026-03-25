@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -272,6 +272,10 @@ ref_student_id
 ,standing_long_jump_degree
 ,sit_up_degree
 ,cardiorespiratory_degree
+,curl
+,curl_degree
+,pacer
+,pacer_degree
 FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", StudentIDList.ToArray()) + @"')
 ";
 
@@ -361,6 +365,38 @@ FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", St
                                     if (addStringList.Contains(ss))
                                         addCount++;
                                 }
+                            }
+
+                            if (dr["curl_degree"] != null)
+                            {
+                                string ss = dr["curl_degree"].ToString().Trim();
+                                if (ss != "" && ss != "未檢測")
+                                {
+                                    si.curl_degreeList.Add(ss);
+                                }
+                            }
+
+                            if (dr["pacer_degree"] != null)
+                            {
+                                string ss = dr["pacer_degree"].ToString().Trim();
+                                if (ss != "" && ss != "未檢測")
+                                {
+                                    si.pacer_degreeList.Add(ss);
+                                }
+                            }
+
+                            if (dr["curl"] != null)
+                            {
+                                string ss = dr["curl"].ToString().Trim();
+                                if (ss != "" && ss != "未檢測")
+                                    si.Curl = ss;
+                            }
+
+                            if (dr["pacer"] != null)
+                            {
+                                string ss = dr["pacer"].ToString().Trim();
+                                if (ss != "" && ss != "未檢測")
+                                    si.Pacer = ss;
                             }
 
                             // 4 次都符合銅牌以上，符合加分

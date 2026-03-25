@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -133,6 +133,12 @@ namespace ChiaYiExcessCompetition.DAO
         /// 體適能是否加分
         /// </summary>
         public bool isAddFitnessScore = false;
+
+        // 仰臥捲腹
+        public string Curl { get; set; }
+
+        // 漸速耐力跑
+        public string Pacer { get; set; }
 
         /// <summary>
         /// 競賽總積分
@@ -371,6 +377,8 @@ namespace ChiaYiExcessCompetition.DAO
         public List<string> standing_long_jump_degreeList = new List<string>();
         public List<string> sit_up_degreeList = new List<string>();
         public List<string> cardiorespiratory_degreeList = new List<string>();
+        public List<string> curl_degreeList = new List<string>();
+        public List<string> pacer_degreeList = new List<string>();
 
         /// <summary>
         /// 計算體適能分數
@@ -429,6 +437,24 @@ namespace ChiaYiExcessCompetition.DAO
                 foreach (string name in passStringList)
                 {
                     if (cardiorespiratory_degreeList.Contains(name))
+                    {
+                        score += 3;
+                        break;
+                    }
+                }
+
+                foreach (string name in passStringList)
+                {
+                    if (curl_degreeList.Contains(name))
+                    {
+                        score += 3;
+                        break;
+                    }
+                }
+
+                foreach (string name in passStringList)
+                {
+                    if (pacer_degreeList.Contains(name))
                     {
                         score += 3;
                         break;
