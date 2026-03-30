@@ -367,21 +367,35 @@ FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", St
                                 }
                             }
 
+                            // curl_degree
                             if (dr["curl_degree"] != null)
                             {
                                 string ss = dr["curl_degree"].ToString().Trim();
-                                if (ss != "" && ss != "未檢測")
+                                if (ss == "" || ss == "未檢測")
+                                {
+
+                                }
+                                else
                                 {
                                     si.curl_degreeList.Add(ss);
+                                    if (addStringList.Contains(ss))
+                                        addCount++;
                                 }
                             }
 
+                            // pacer_degree
                             if (dr["pacer_degree"] != null)
                             {
                                 string ss = dr["pacer_degree"].ToString().Trim();
-                                if (ss != "" && ss != "未檢測")
+                                if (ss == "" || ss == "未檢測")
+                                {
+
+                                }
+                                else
                                 {
                                     si.pacer_degreeList.Add(ss);
+                                    if (addStringList.Contains(ss))
+                                        addCount++;
                                 }
                             }
 
@@ -399,8 +413,8 @@ FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", St
                                     si.Pacer = ss;
                             }
 
-                            // 4 次都符合銅牌以上，符合加分
-                            if (addCount == 4)
+                            // 6 項中至少 4 項符合銅牌以上，符合加分
+                            if (addCount >= 4)
                                 si.isAddFitnessScore = true;
 
                         }
@@ -846,8 +860,32 @@ ORDER BY test_date";
                                     addCount++;
                             }
 
-                            // 4 次都符合銅牌以上，符合加分
-                            if (addCount == 4)
+                            // curl_degree
+                            if (fi.CurlDegree == "" || fi.CurlDegree == "未檢測")
+                            {
+
+                            }
+                            else
+                            {
+                                si.curl_degreeList.Add(fi.CurlDegree);
+                                if (addStringList.Contains(fi.CurlDegree))
+                                    addCount++;
+                            }
+
+                            // pacer_degree
+                            if (fi.PacerDegree == "" || fi.PacerDegree == "未檢測")
+                            {
+
+                            }
+                            else
+                            {
+                                si.pacer_degreeList.Add(fi.PacerDegree);
+                                if (addStringList.Contains(fi.PacerDegree))
+                                    addCount++;
+                            }
+
+                            // 6 項中至少 4 項符合銅牌以上，符合加分
+                            if (addCount >= 4)
                                 si.isAddFitnessScore = true;
                         }
                     }

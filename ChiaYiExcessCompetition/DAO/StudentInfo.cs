@@ -130,7 +130,7 @@ namespace ChiaYiExcessCompetition.DAO
         public int FitnessScore = 0;
 
         /// <summary>
-        /// 體適能是否加分
+        /// 體適能是否加分（於 QueryData.FillStudentFitness 依 6 項中至少 4 項達銅牌以上設定）
         /// </summary>
         public bool isAddFitnessScore = false;
 

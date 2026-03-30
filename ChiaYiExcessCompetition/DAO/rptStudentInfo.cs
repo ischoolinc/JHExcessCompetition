@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -183,6 +183,8 @@ namespace ChiaYiExcessCompetition.DAO
         public List<string> standing_long_jump_degreeList = new List<string>();
         public List<string> sit_up_degreeList = new List<string>();
         public List<string> cardiorespiratory_degreeList = new List<string>();
+        public List<string> curl_degreeList = new List<string>();
+        public List<string> pacer_degreeList = new List<string>();
 
         /// <summary>
         /// 取得學期領域成績
@@ -331,6 +333,24 @@ namespace ChiaYiExcessCompetition.DAO
                 foreach (string name in passStringList)
                 {
                     if (cardiorespiratory_degreeList.Contains(name))
+                    {
+                        score += 3;
+                        break;
+                    }
+                }
+
+                foreach (string name in passStringList)
+                {
+                    if (curl_degreeList.Contains(name))
+                    {
+                        score += 3;
+                        break;
+                    }
+                }
+
+                foreach (string name in passStringList)
+                {
+                    if (pacer_degreeList.Contains(name))
                     {
                         score += 3;
                         break;
