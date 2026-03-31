@@ -434,11 +434,12 @@ namespace ChiaYiExcessCompetition.DAO
                     }
                 }
 
+                bool cardiorespiratoryPass = false;
                 foreach (string name in passStringList)
                 {
                     if (cardiorespiratory_degreeList.Contains(name))
                     {
-                        score += 3;
+                        cardiorespiratoryPass = true;
                         break;
                     }
                 }
@@ -452,13 +453,20 @@ namespace ChiaYiExcessCompetition.DAO
                     }
                 }
 
+                bool pacerPass = false;
                 foreach (string name in passStringList)
                 {
                     if (pacer_degreeList.Contains(name))
                     {
-                        score += 3;
+                        pacerPass = true;
                         break;
                     }
+                }
+
+                // 心肺耐力類：cardiorespiratory / pacer 只算一次
+                if (cardiorespiratoryPass || pacerPass)
+                {
+                    score += 3;
                 }
 
                 if (score > 9)

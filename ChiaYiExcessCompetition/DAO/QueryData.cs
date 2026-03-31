@@ -302,6 +302,8 @@ FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", St
                         foreach (DataRow dr in finDict[si.StudentID])
                         {
                             int addCount = 0;
+                            bool cardiorespiratoryAdd = false;
+                            bool pacerAdd = false;
 
                             // sit_and_reach_degree
                             if (dr["sit_and_reach_degree"] != null)
@@ -363,7 +365,7 @@ FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", St
                                 {
                                     si.cardiorespiratory_degreeList.Add(ss);
                                     if (addStringList.Contains(ss))
-                                        addCount++;
+                                        cardiorespiratoryAdd = true;
                                 }
                             }
 
@@ -395,9 +397,13 @@ FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", St
                                 {
                                     si.pacer_degreeList.Add(ss);
                                     if (addStringList.Contains(ss))
-                                        addCount++;
+                                        pacerAdd = true;
                                 }
                             }
+
+                            // 心肺耐力類：cardiorespiratory / pacer 只算一次
+                            if (cardiorespiratoryAdd || pacerAdd)
+                                addCount++;
 
                             if (dr["curl"] != null)
                             {
@@ -810,6 +816,8 @@ ORDER BY test_date";
                             fi.Age = si.GetAge(fi.TestDate);
 
                             int addCount = 0;
+                            bool cardiorespiratoryAdd = false;
+                            bool pacerAdd = false;
 
                             // sit_and_reach_degree
                             if (fi.Sit_and_reach_degree == "" || fi.Sit_and_reach_degree == "未檢測")
@@ -857,7 +865,7 @@ ORDER BY test_date";
                             {
                                 si.cardiorespiratory_degreeList.Add(fi.Cardiorespiratory_degree);
                                 if (addStringList.Contains(fi.Cardiorespiratory_degree))
-                                    addCount++;
+                                    cardiorespiratoryAdd = true;
                             }
 
                             // curl_degree
@@ -881,8 +889,12 @@ ORDER BY test_date";
                             {
                                 si.pacer_degreeList.Add(fi.PacerDegree);
                                 if (addStringList.Contains(fi.PacerDegree))
-                                    addCount++;
+                                    pacerAdd = true;
                             }
+
+                            // 心肺耐力類：cardiorespiratory / pacer 只算一次
+                            if (cardiorespiratoryAdd || pacerAdd)
+                                addCount++;
 
                             // 6 項中至少 4 項符合銅牌以上，符合加分
                             if (addCount >= 4)
