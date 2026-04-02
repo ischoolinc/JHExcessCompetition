@@ -321,22 +321,30 @@ namespace ChiaYiExcessCompetition.DAO
                     }
                 }
 
+                bool sitUpPass = false;
                 foreach (string name in passStringList)
                 {
                     if (sit_up_degreeList.Contains(name))
                     {
-                        score += 3;
+                        sitUpPass = true;
                         break;
                     }
                 }
 
+                bool curlPass = false;
                 foreach (string name in passStringList)
                 {
                     if (curl_degreeList.Contains(name))
                     {
-                        score += 3;
+                        curlPass = true;
                         break;
                     }
+                }
+
+                // 肌耐力類：sit_up / curl 只算一次
+                if (sitUpPass || curlPass)
+                {
+                    score += 3;
                 }
 
                 bool cardiorespiratoryPass = false;

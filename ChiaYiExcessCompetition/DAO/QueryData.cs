@@ -304,6 +304,8 @@ FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", St
                             int addCount = 0;
                             bool cardiorespiratoryAdd = false;
                             bool pacerAdd = false;
+                            bool sitUpAdd = false;
+                            bool curlAdd = false;
 
                             // sit_and_reach_degree
                             if (dr["sit_and_reach_degree"] != null)
@@ -349,7 +351,7 @@ FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", St
                                 {
                                     si.sit_up_degreeList.Add(ss);
                                     if (addStringList.Contains(ss))
-                                        addCount++;
+                                        sitUpAdd = true;
                                 }
                             }
 
@@ -381,9 +383,13 @@ FROM $ischool_student_fitness WHERE ref_student_id IN('" + string.Join("','", St
                                 {
                                     si.curl_degreeList.Add(ss);
                                     if (addStringList.Contains(ss))
-                                        addCount++;
+                                        curlAdd = true;
                                 }
                             }
+
+                            // 肌耐力類：sit_up / curl 只算一次
+                            if (sitUpAdd || curlAdd)
+                                addCount++;
 
                             // pacer_degree
                             if (dr["pacer_degree"] != null)
@@ -818,6 +824,8 @@ ORDER BY test_date";
                             int addCount = 0;
                             bool cardiorespiratoryAdd = false;
                             bool pacerAdd = false;
+                            bool sitUpAdd = false;
+                            bool curlAdd = false;
 
                             // sit_and_reach_degree
                             if (fi.Sit_and_reach_degree == "" || fi.Sit_and_reach_degree == "未檢測")
@@ -853,7 +861,7 @@ ORDER BY test_date";
                             {
                                 si.sit_up_degreeList.Add(fi.Sit_up_degree);
                                 if (addStringList.Contains(fi.Sit_up_degree))
-                                    addCount++;
+                                    sitUpAdd = true;
                             }
 
                             // cardiorespiratory_degree
@@ -877,8 +885,12 @@ ORDER BY test_date";
                             {
                                 si.curl_degreeList.Add(fi.CurlDegree);
                                 if (addStringList.Contains(fi.CurlDegree))
-                                    addCount++;
+                                    curlAdd = true;
                             }
+
+                            // 肌耐力類：sit_up / curl 只算一次
+                            if (sitUpAdd || curlAdd)
+                                addCount++;
 
                             // pacer_degree
                             if (fi.PacerDegree == "" || fi.PacerDegree == "未檢測")
